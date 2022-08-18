@@ -1,0 +1,44 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Runtime.InteropServices;
+namespace MediaDesktop
+{
+    public class SystemAPIs
+    {
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern Int32 SendMessageA([In] IntPtr handleOfWindow, [In] UInt32 Message, [In] IntPtr wParam, [In] IntPtr lParam);
+
+
+        [DllImport("user32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.I1)]
+        public static extern Boolean PostMessageA([In] IntPtr handleOfWindow, [In] UInt32 Message, [In] IntPtr wParam, [In] IntPtr lParam);
+
+
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern IntPtr SetParent([In] IntPtr handleOfChildWindow, [In, Optional] IntPtr handleOfNewParentWindow);
+
+
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern IntPtr FindWindowExA([In, Optional] IntPtr handleOfParentWindow, [In, Optional] IntPtr handleOfChildAfter, [In, Optional] string className, [In, Optional] string windowText);
+
+        [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Ansi)]
+        public static extern IntPtr FindWindowA([In, Optional] string className, [In, Optional] string windowText);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern Int32 GetWindowThreadProcessId([In] IntPtr windowHandle, [Out, Optional]out Int32 processId);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.I1)]
+        public static extern Boolean IsWindowEnabled([In] IntPtr windowHandle);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.I1)]
+        public static extern Boolean IsWindowVisible([In] IntPtr windowHandle);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.I1)]
+        public static extern Boolean ShowWindow([In] IntPtr windowHandle ,[In] int command);
+
+    }
+}

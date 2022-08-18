@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <Platforms>AnyCPU;x64</Platforms>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="LibVLCSharp.WinForms" Version="3.6.6" />
+    <PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.17.4" />
+  </ItemGroup>
+
+</Project>
