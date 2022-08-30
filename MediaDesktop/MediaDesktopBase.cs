@@ -121,6 +121,7 @@ namespace MediaDesktop
         public MediaDesktopBase()
         {
             Startup();
+            Control.CheckForIllegalCrossThreadCalls = false;
         }
     }
 

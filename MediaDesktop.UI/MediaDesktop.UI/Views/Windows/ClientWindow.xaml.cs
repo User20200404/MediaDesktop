@@ -14,7 +14,9 @@ using Windows.Foundation;
 using Windows.Foundation.Collections;
 using MediaDesktop.UI.Views.Windows;
 using System.ComponentModel;
-
+using MediaDesktop.UI.Services;
+using MediaDesktop.UI.ViewModels;
+using LibVLCSharp.Shared;
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
@@ -25,10 +27,19 @@ namespace MediaDesktop.UI.Views.Windows
     /// </summary>
     public sealed partial class ClientWindow : Window
     {
+        public static ClientWindow Instance { get; set; }
         public ClientWindow()
         {
+            Instance = this;
             this.InitializeComponent();
+            GlobalResources.InitializeAsync();
+            mainContentFrame.Navigate(typeof(Views.Pages.ClientHostPage));
+            this.Closed += ClientWindow_Closed;
         }
 
+        private void ClientWindow_Closed(object sender, WindowEventArgs args)
+        {
+            GlobalResources.ViewModelCollection.SettingsItemViewModel.Save();
+        }
     }
 }

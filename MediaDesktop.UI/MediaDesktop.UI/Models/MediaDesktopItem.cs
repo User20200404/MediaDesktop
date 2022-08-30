@@ -8,6 +8,7 @@ namespace MediaDesktop.UI.Models
 {
     public class MediaDesktopItem
     {
+        public int HistoryLevel { get; set; }
         public string MediaPath { get; set; }
         public string ImagePath { get; set; }
         public string Title { get; set; }
@@ -22,6 +23,7 @@ namespace MediaDesktop.UI.Models
         /// </summary>
         public MediaDesktopItem()
         {
+            HistoryLevel = -1;
             MediaPath = "";
             ImagePath = "";
             Title = "";

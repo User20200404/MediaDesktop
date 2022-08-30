@@ -13,6 +13,20 @@ namespace MediaDesktop.UI.ViewModels
         private MediaDesktopItem mediaDesktopItem;
         #endregion
         #region Raw Data Encapsulation
+
+        public int HistoryLevel
+        {
+            get { return mediaDesktopItem.HistoryLevel; }
+            set
+            {
+                if (mediaDesktopItem.HistoryLevel != value)
+                {
+                    mediaDesktopItem.HistoryLevel = value;
+                    OnPropertyChanged(nameof(HistoryLevel));
+                }
+            }
+        }
+
         public string MediaPath
         {
             get { return mediaDesktopItem.MediaPath; }
@@ -21,6 +35,7 @@ namespace MediaDesktop.UI.ViewModels
                 if (mediaDesktopItem.MediaPath != value)
                 {
                     mediaDesktopItem.MediaPath = value;
+                    MediaItemViewModel.MediaPath = value;
                     OnPropertyChanged(nameof(MediaPath));
                 }
             }
@@ -61,18 +76,70 @@ namespace MediaDesktop.UI.ViewModels
                 }
             }
         }
+
+        public bool IsFavourite
+        {
+            get { return mediaDesktopItem.IsFavourite; }
+            set
+            {
+                if (mediaDesktopItem.IsFavourite != value)
+                {
+                    mediaDesktopItem.IsFavourite = value;
+                    OnPropertyChanged(nameof(IsFavourite));
+                }
+            }
+        }
+
+        public MediaDesktopItemViewModel Self
+        {
+            get { return this; }
+        }
         #endregion
+
+
         #region Sub-ViewModel
         public MediaItemViewModel MediaItemViewModel { get; private set; }
+        #endregion
+
+        #region Inner Methods
+        private void DelegateCommandStartup()
+        {
+            ToggleFavouriteCommand = new DelegateCommand((obj) => { ToggleFavourite(); });
+            ResetHistoryLevelCommand = new DelegateCommand((obj) => { ResetHistoryLevel(); });
+        }
+        #endregion
+
+        #region Public Methods
+        public void ToggleFavourite()
+        {
+            IsFavourite = !IsFavourite;
+        }
+
+        public void ResetHistoryLevel()
+        {
+            //We pass this request to ViewModelCollection.
+            if (this.HistoryLevel != -1)
+            {
+                HistoryLevelResetRequired?.Invoke(this, EventArgs.Empty);
+            }
+        }
+        #endregion
+
+        #region Delegate Commands
+        public DelegateCommand ToggleFavouriteCommand { get; set; }
+        public DelegateCommand ResetHistoryLevelCommand { get; set; }
         #endregion
 
         public MediaDesktopItemViewModel()
         {
             mediaDesktopItem = new MediaDesktopItem();
             MediaItemViewModel = new MediaItemViewModel();
+
+            DelegateCommandStartup();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
+        public event EventHandler HistoryLevelResetRequired;
         protected void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

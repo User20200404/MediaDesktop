@@ -13,7 +13,6 @@ namespace MediaDesktop.UI.Models
         public string MediaPath { get; set; }
         public bool IsMediaLoaded { get { return Media is not null; } }
 
-
         /// <summary>
         /// Ctor.
         /// </summary>

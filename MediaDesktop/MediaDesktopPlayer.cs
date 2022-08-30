@@ -7,17 +7,22 @@ using LibVLCSharp.Shared;
 using LibVLCSharp.WinForms;
 namespace MediaDesktop
 {
+    public delegate void MediaPlayerChangeEventHandler(object sender,MediaPlayerChangeEventArgs args);
     public class MediaDesktopPlayer
     {
         private VideoView mediaPresenter;
         private LibVLC libVLC;
         private MediaPlayer mediaPlayer;
 
+        public event MediaPlayerChangeEventHandler MediaPlayerChanging;
+        public event EventHandler MediaPlayerEndReached;
+
         /// <summary>
         /// Get the instance of <see cref="LibVLCSharp.Shared.LibVLC"/> for current player.
         /// </summary>
         public LibVLC LibVLC
         {
+            set { libVLC = value; }
             get { return libVLC; }
         }
 
@@ -35,19 +40,51 @@ namespace MediaDesktop
         public MediaPlayer MediaPlayer
         {
             get { return mediaPlayer; }
+            set
+            {
+                if (mediaPlayer != value)
+                {
+                    MediaPlayerChanging?.Invoke(this, new MediaPlayerChangeEventArgs(mediaPresenter.MediaPlayer,value));
+                    mediaPlayer = value;
+                }
+            }
         }
 
+        private void EventStartup()
+        {
+            MediaPlayerChanging += This_MediaPlayerChanging;
+        }
+
+        private void This_MediaPlayerChanging(object sender, MediaPlayerChangeEventArgs args)
+        {
+            args.OldMediaPlayer?.Stop();
+            mediaPresenter.MediaPlayer = args.NewMediaPlayer;
+
+            if (args.NewMediaPlayer != null)
+            {
+                args.NewMediaPlayer.EndReached += MediaPlayer_EndReached;
+            }
+
+            if(args.OldMediaPlayer != null)
+            {
+                args.OldMediaPlayer.EndReached -= MediaPlayer_EndReached;
+            }
+           
+        }
+
+        private void MediaPlayer_EndReached(object sender, EventArgs e)
+        {
+            MediaPlayerEndReached?.Invoke(this, EventArgs.Empty);   
+        }
 
         private void PlayerStartup(int screenWidth, int screenHeight)
         {
             mediaPresenter = new VideoView();
-            libVLC = new LibVLC("--input-repeat=999");
-            mediaPlayer = new MediaPlayer(libVLC);
             mediaPresenter.MediaPlayer = mediaPlayer;
             mediaPresenter.Height = screenHeight;
             mediaPresenter.Width = screenWidth;
             mediaPresenter.Left = 0;
-            mediaPresenter.Top = 0; 
+            mediaPresenter.Top = 0;
         }
 
         /// <summary>
@@ -55,8 +92,10 @@ namespace MediaDesktop
         /// </summary>
         public MediaDesktopPlayer()
         {
+            Control.CheckForIllegalCrossThreadCalls = false;
             APIsPackaged.GetScreenResolution(out int width, out int height);
             PlayerStartup(width, height);
+            EventStartup();
         }
 
         /// <summary>
@@ -76,9 +115,8 @@ namespace MediaDesktop
         public void SetMedia(Stream stream)
         {
             Media media = new Media(libVLC, new StreamMediaInput(stream));
-            mediaPlayer.Media = media;        
+            mediaPlayer.Media = media;
         }
-
 
         /// <summary>
         /// Start or resume the current media playing.
@@ -90,14 +128,17 @@ namespace MediaDesktop
         }
 
         /// <summary>
-        /// Pause the current media playing. Some media may not support this operation.
+        /// Pause the current media playing (no effect if there is no media or media has been paused). Some media may not support this operation.
         /// </summary>
         /// <exception cref="InvalidOperationException"></exception>
         public void Pause()
         {
-            if(mediaPlayer.CanPause)
+            if (mediaPlayer.CanPause)
             {
-                mediaPlayer.Pause();
+                if (mediaPlayer.IsPlaying)
+                {
+                    mediaPlayer.Pause();
+                }
             }
             else
             {
@@ -123,4 +164,17 @@ namespace MediaDesktop
             mediaPresenter.Show();
         }
     }
+
+    public class MediaPlayerChangeEventArgs
+    {
+        public MediaPlayerChangeEventArgs(MediaPlayer oldPlayer,MediaPlayer newPlayer)
+        {
+            this.OldMediaPlayer = oldPlayer;
+            this.NewMediaPlayer = newPlayer;
+        }
+
+        public MediaPlayer OldMediaPlayer { get; private set; }
+        public MediaPlayer NewMediaPlayer { get; private set; }
+    }
 }
+

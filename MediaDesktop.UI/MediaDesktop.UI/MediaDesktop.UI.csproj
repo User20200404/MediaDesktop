@@ -10,6 +10,15 @@
     <UseWinUI>true</UseWinUI>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Resources\HeartButtonForeground.xaml" />
+    <None Remove="Views\Dialogs\MediaInfoDialogPage.xaml" />
+    <None Remove="Views\Dialogs\ModifyItemDialogPage.xaml" />
+    <None Remove="Views\Pages\ClientHostPage.xaml" />
+    <None Remove="Views\Pages\LibraryPage.xaml" />
+    <None Remove="Views\Pages\SettingsHostPage.xaml" />
+    <None Remove="Views\Pages\SettingsPage.xaml" />
+    <None Remove="Views\Pages\SettingsPage_About.xaml" />
+    <None Remove="Views\Pages\SettingsPage_Storage.xaml" />
     <None Remove="Views\Windows\ClientWindow.xaml" />
   </ItemGroup>
 
@@ -23,16 +32,65 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Services\" />
-    <Folder Include="Views\Pages\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\..\MediaDesktop\MediaDesktop.csproj" />
   </ItemGroup>
 
   <ItemGroup>
+    <Page Update="Views\Pages\SettingsPage_Storage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Views\Pages\SettingsPage_About.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Views\Pages\SettingsHostPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Views\Pages\SettingsPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Views\Dialogs\MediaInfoDialogPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Views\Pages\ClientHostPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Views\Pages\LibraryPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
     <Page Update="Views\Windows\ClientWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Resources\HeartButtonForeground.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Views\Dialogs\ModifyItemDialogPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
