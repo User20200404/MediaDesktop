@@ -8,6 +8,7 @@ using LibVLCSharp.WinForms;
 namespace MediaDesktop
 {
     public delegate void MediaPlayerChangeEventHandler(object sender,MediaPlayerChangeEventArgs args);
+    public delegate void MediaPlayerPlayingEventHandler(object sender, MediaPlayer args);
     public class MediaDesktopPlayer
     {
         private VideoView mediaPresenter;
@@ -15,6 +16,7 @@ namespace MediaDesktop
         private MediaPlayer mediaPlayer;
 
         public event MediaPlayerChangeEventHandler MediaPlayerChanging;
+        public event MediaPlayerPlayingEventHandler MediaPlayerPlaying; 
         public event EventHandler MediaPlayerEndReached;
 
         /// <summary>
@@ -58,18 +60,28 @@ namespace MediaDesktop
         private void This_MediaPlayerChanging(object sender, MediaPlayerChangeEventArgs args)
         {
             args.OldMediaPlayer?.Stop();
+
+            
             mediaPresenter.MediaPlayer = args.NewMediaPlayer;
+
 
             if (args.NewMediaPlayer != null)
             {
                 args.NewMediaPlayer.EndReached += MediaPlayer_EndReached;
+                args.NewMediaPlayer.Playing += NewMediaPlayer_Playing;
             }
 
             if(args.OldMediaPlayer != null)
             {
-                args.OldMediaPlayer.EndReached -= MediaPlayer_EndReached;
+                args.OldMediaPlayer.EndReached -= MediaPlayer_EndReached; 
+                args.OldMediaPlayer.Playing -= NewMediaPlayer_Playing;
             }
            
+        }
+
+        private void NewMediaPlayer_Playing(object sender, EventArgs e)
+        {
+            MediaPlayerPlaying?.Invoke(this, MediaPlayer);
         }
 
         private void MediaPlayer_EndReached(object sender, EventArgs e)
@@ -135,10 +147,7 @@ namespace MediaDesktop
         {
             if (mediaPlayer.CanPause)
             {
-                if (mediaPlayer.IsPlaying)
-                {
-                    mediaPlayer.Pause();
-                }
+                mediaPlayer.SetPause(true);
             }
             else
             {

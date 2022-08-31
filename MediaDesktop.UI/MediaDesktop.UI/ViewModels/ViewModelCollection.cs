@@ -127,7 +127,8 @@ namespace MediaDesktop.UI.ViewModels
 
         private void SettingsNavigationItemViewModels_Bread_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            OnPropertyChanged(nameof(SettingsNavigationItemViewModels_Bread));
+            ClientHostPage.Instance.DispatcherQueue.TryEnqueue(() => { OnPropertyChanged(nameof(SettingsNavigationItemViewModels_Bread)); });
+
         }
 
         private void MediaDesktopPlayer_MediaPlayerEndReached(object sender, EventArgs e)

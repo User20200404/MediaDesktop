@@ -13,6 +13,7 @@ using System.IO;
 using Microsoft.UI.Xaml.Controls;
 using MediaDesktop.UI.Views.Windows;
 using Windows.Storage.Pickers;
+using System.Threading;
 
 namespace MediaDesktop.UI.ViewModels
 {
@@ -178,12 +179,13 @@ namespace MediaDesktop.UI.ViewModels
         private void EventStartup()
         {
             PropertyChanged += This_PropertyChanged;
-            GlobalResources.MediaDesktopPlayer.MediaPlayerChanging += MediaDesktopPlayer_MediaPlayerChanging; ;
+            GlobalResources.MediaDesktopPlayer.MediaPlayerPlaying += MediaDesktopPlayer_MediaPlayerPlaying;
+
         }
 
-        private void MediaDesktopPlayer_MediaPlayerChanging(object sender, MediaPlayerChangeEventArgs args)
+        private void MediaDesktopPlayer_MediaPlayerPlaying(object sender, LibVLCSharp.Shared.MediaPlayer args)
         {
-            Task.Run(() => { args.NewMediaPlayer.Volume = Volume; });
+            Task.Run(()=> { args.Mute = true; Thread.Sleep(150); args.Volume = Volume; args.Mute = false; });
         }
 
         private void This_PropertyChanged(object sender, PropertyChangedEventArgs e)
