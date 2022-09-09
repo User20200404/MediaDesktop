@@ -17,10 +17,13 @@ namespace MediaDesktop.UI.ViewModels
 {
     public class ViewModelCollection : INotifyPropertyChanged
     {
+
         private MediaDesktopItemViewModel currentDesktopItemViewModel;
         private SettingsItemViewModel settingsItemViewModel;
+        private ObservableCollection<MediaDesktopItemViewModel> currentPlayingList;
         private ObservableCollection<MediaDesktopItemViewModel> viewModelItems_Favourite;
         private ObservableCollection<MediaDesktopItemViewModel> viewModelItems_History;
+        private ObservableCollection<MediaPlayingListViewModel> mediaPlayingListViewModels;
 
         /// <summary>
         /// Do not modify this collection except using provided methods and delegate commands.
@@ -28,6 +31,23 @@ namespace MediaDesktop.UI.ViewModels
         public ObservableCollection<MediaDesktopItemViewModel> ViewModelItems { get; private set; }
         public ObservableCollection<SettingsNavigationItemViewModel> SettingsNavigationItemViewModels { get; private set; }
         public ObservableCollection<SettingsNavigationItemViewModel> SettingsNavigationItemViewModels_Bread { get; private set; }
+        public MediaDesktopItemViewModelConfig MediaDesktopItemViewModelConfig { get; private set; }
+        public MediaPlayingListConfig MediaPlayingListConfig { get; private set; }
+
+
+        public ObservableCollection<MediaDesktopItemViewModel> CurrentPlayingList
+        {
+            get { return currentPlayingList; }
+            set
+            {
+                if(currentPlayingList != value)
+                {
+                    currentPlayingList = value;
+                    OnPropertyChanged(nameof(CurrentPlayingList));
+                }
+            }
+        }
+
         public ObservableCollection<MediaDesktopItemViewModel> ViewModelItems_Favourite
         {
             get { return viewModelItems_Favourite; }
@@ -54,8 +74,18 @@ namespace MediaDesktop.UI.ViewModels
             }
         }
 
-
-        public MediaDesktopItemConfig MediaDesktopItemConfig { get; private set; }
+        public ObservableCollection<MediaPlayingListViewModel> MediaPlayingListViewModels
+        {
+            get { return mediaPlayingListViewModels; }
+            private set
+            {
+                if(mediaPlayingListViewModels != value)
+                {
+                    mediaPlayingListViewModels = value;
+                    OnPropertyChanged(nameof(MediaPlayingListViewModels));
+                }
+            }
+        }
         public MediaDesktopItemViewModel CurrentDesktopItemViewModel
         {
             get { return currentDesktopItemViewModel; }
@@ -85,7 +115,11 @@ namespace MediaDesktop.UI.ViewModels
         public ViewModelCollection()
         {
             ViewModelItems = new ObservableCollection<MediaDesktopItemViewModel>();
-            MediaDesktopItemConfig = new MediaDesktopItemConfig(this);
+            MediaPlayingListViewModels = new ObservableCollection<MediaPlayingListViewModel>();
+            CurrentPlayingList = new ObservableCollection<MediaDesktopItemViewModel>();
+            MediaDesktopItemViewModelConfig = new MediaDesktopItemViewModelConfig(this);
+            MediaPlayingListConfig = new MediaPlayingListConfig(this);
+
             SettingsItemViewModel = new SettingsItemViewModel();
             InitSettingsNavigationViewItems();
             EventStartup();
@@ -111,6 +145,9 @@ namespace MediaDesktop.UI.ViewModels
 
         private void DelegateCommandStartup()
         {
+            PlayNextCommand = new DelegateCommand((obj) => { PlayNext(); });
+            PlayLastCommand = new DelegateCommand((obj) => { PlayLast(); });
+            AddPlayingListViewModelCommand = new DelegateCommand((obj) => { AddPlayingListViewModel(Views.Pages.ClientHostPage.Instance.XamlRoot); });
             AddViewModelCommand = new DelegateCommand((obj) => { AddViewModel(Views.Pages.ClientHostPage.Instance.XamlRoot); });
             EditViewModelCommand = new DelegateCommand((obj) => { EditViewModel(Views.Pages.ClientHostPage.Instance.XamlRoot, obj as MediaDesktopItemViewModel); });
             RemoveViewModelCommand = new DelegateCommand((obj) => { RemoveViewModel(Views.Pages.ClientHostPage.Instance.XamlRoot, obj as MediaDesktopItemViewModel); });
@@ -123,7 +160,10 @@ namespace MediaDesktop.UI.ViewModels
             GlobalResources.MediaDesktopPlayer.MediaPlayerEndReached += MediaDesktopPlayer_MediaPlayerEndReached;
             SettingsNavigationItemViewModels_Bread.CollectionChanged += SettingsNavigationItemViewModels_Bread_CollectionChanged;
             ViewModelItems.CollectionChanged += ViewModelItems_CollectionChanged;
+            CurrentPlayingList.CollectionChanged += CurrentPlayingList_CollectionChanged;
         }
+
+    
 
         private void SettingsNavigationItemViewModels_Bread_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
@@ -134,38 +174,114 @@ namespace MediaDesktop.UI.ViewModels
         private void MediaDesktopPlayer_MediaPlayerEndReached(object sender, EventArgs e)
         {
             PlayBackMode mode = SettingsItemViewModel.PlayBackMode;
+
             switch (mode)
             {
                 case PlayBackMode.Shuffle:
-
-                    Task.Run(() =>
-                    {
-                        int index = ViewModelItems.IndexOf(CurrentDesktopItemViewModel);
-                        if (ViewModelItems.Last() == CurrentDesktopItemViewModel)
-                        {
-                            GlobalResources.MediaDesktopPlayer.MediaPlayer = ViewModelItems.First().MediaItemViewModel.RuntimeDataSet.MediaPlayer;
-                        }
-                        else
-                        {
-                            GlobalResources.MediaDesktopPlayer.MediaPlayer = ViewModelItems[index + 1].MediaItemViewModel.RuntimeDataSet.MediaPlayer;
-                        }
-                        GlobalResources.MediaDesktopPlayer.Stop();
-                        GlobalResources.MediaDesktopPlayer.Play();
-                    });
-
+                    PlayNext();
                     break;
                 case PlayBackMode.RepeatOne:
-                    Task.Run(() =>
-                    {
-                        CurrentDesktopItemViewModel.MediaItemViewModel.RuntimeDataSet.MediaPlayer.Media = CurrentDesktopItemViewModel.MediaItemViewModel.Media;
-                        CurrentDesktopItemViewModel.MediaItemViewModel.RuntimeDataSet.MediaPlayer.Play();
-                    });
-
+                    PlayRepeatOne();
                     break;
                 default:
                     break;
             }
         }
+        private void PlayRepeatOne()
+        {
+            Task.Run(() =>
+            {
+                CurrentDesktopItemViewModel.MediaItemViewModel.RuntimeDataSet.MediaPlayer.Media = CurrentDesktopItemViewModel.MediaItemViewModel.Media;
+                CurrentDesktopItemViewModel.MediaItemViewModel.RuntimeDataSet.MediaPlayer.Play();
+            });
+        }
+
+        private void PlayNext()
+        {
+            if (CurrentPlayingList is null)
+                return;
+
+            Task.Run(() =>
+            {
+                int index = CurrentPlayingList.IndexOf(CurrentDesktopItemViewModel);
+                if (CurrentPlayingList.Last() == CurrentDesktopItemViewModel)
+                {
+                    //GlobalResources.MediaDesktopPlayer.MediaPlayer = CurrentPlayingList.First().MediaItemViewModel.RuntimeDataSet.MediaPlayer;
+                    CurrentPlayingList.First().MediaItemViewModel.PlayMedia(GlobalResources.MediaDesktopPlayer);
+
+                    if(CurrentPlayingList.First() == CurrentPlayingList.Last())
+                        GlobalResources.MediaDesktopPlayer.Stop();
+                }
+                else
+                {
+                    // GlobalResources.MediaDesktopPlayer.MediaPlayer = CurrentPlayingList[index + 1].MediaItemViewModel.RuntimeDataSet.MediaPlayer;
+                    CurrentPlayingList[index + 1].MediaItemViewModel.PlayMedia(GlobalResources.MediaDesktopPlayer);
+                }
+
+                GlobalResources.MediaDesktopPlayer.Play();
+            });
+        }
+
+        private void PlayLast()
+        {
+            if (CurrentPlayingList is null)
+                return;
+
+            Task.Run(() =>
+            {
+                int index = CurrentPlayingList.IndexOf(CurrentDesktopItemViewModel);
+                if (CurrentPlayingList.First() == CurrentDesktopItemViewModel)
+                {
+                    //GlobalResources.MediaDesktopPlayer.MediaPlayer = CurrentPlayingList.First().MediaItemViewModel.RuntimeDataSet.MediaPlayer;
+                    CurrentPlayingList.Last().MediaItemViewModel.PlayMedia(GlobalResources.MediaDesktopPlayer);
+
+                    if (CurrentPlayingList.First() == CurrentPlayingList.Last())
+                        GlobalResources.MediaDesktopPlayer.Stop();
+                }
+                else
+                {
+                    // GlobalResources.MediaDesktopPlayer.MediaPlayer = CurrentPlayingList[index + 1].MediaItemViewModel.RuntimeDataSet.MediaPlayer;
+                    CurrentPlayingList[index - 1].MediaItemViewModel.PlayMedia(GlobalResources.MediaDesktopPlayer);
+                }
+
+                GlobalResources.MediaDesktopPlayer.Play();
+            });
+        }
+
+        private void CurrentPlayingList_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+
+            if (e.OldItems != null)
+            {
+                bool isPlaying = CurrentDesktopItemViewModel.MediaItemViewModel.RuntimeDataSet.IsMediaPlaying;
+                if (e.OldItems.Contains(CurrentDesktopItemViewModel))
+                {
+                    CurrentDesktopItemViewModel.MediaItemViewModel.StopMedia(GlobalResources.MediaDesktopPlayer);
+                    if (CurrentPlayingList.Count > e.OldStartingIndex)
+                    {
+                        CurrentDesktopItemViewModel = CurrentPlayingList[e.OldStartingIndex];
+                    }
+                    else
+                    {
+                        CurrentDesktopItemViewModel = CurrentPlayingList.LastOrDefault();
+                    }
+
+                    if(isPlaying && CurrentDesktopItemViewModel!=null)
+                    {
+                        CurrentDesktopItemViewModel.MediaItemViewModel.PlayMedia(GlobalResources.MediaDesktopPlayer);
+                    }
+                }
+            }
+
+            if(e.NewItems!=null)
+            {
+                if(CurrentDesktopItemViewModel == null)
+                {
+                    CurrentDesktopItemViewModel = e.NewItems[0] as MediaDesktopItemViewModel;
+                }
+            }
+        }
+
 
         private void ViewModelItems_CollectionChanged(object sender,NotifyCollectionChangedEventArgs e)
         {
@@ -191,7 +307,7 @@ namespace MediaDesktop.UI.ViewModels
                     UpdateHistoryLevel(model, HistoryLevelUpdateReason.ItemRemoved);
                 }
             }
-            MediaDesktopItemConfig.Save();
+            MediaDesktopItemViewModelConfig.Save();
         }
 
         private void DesktopItemViewModel_HistoryLevelResetRequired(object sender, EventArgs e)
@@ -206,7 +322,7 @@ namespace MediaDesktop.UI.ViewModels
         /// <param name="e"></param>
         private void DesktopItemViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            MediaDesktopItemConfig.Save();
+            MediaDesktopItemViewModelConfig.Save();
             MediaDesktopItemViewModel model = sender as MediaDesktopItemViewModel; 
             switch(e.PropertyName)
             {
@@ -231,6 +347,7 @@ namespace MediaDesktop.UI.ViewModels
                 {
                     CurrentDesktopItemViewModel = GetCurrentPlayingModel();
                     UpdateHistoryLevel(CurrentDesktopItemViewModel, HistoryLevelUpdateReason.ItemPlayed);
+                    OnPropertyChanged(nameof(CurrentDesktopItemViewModel));
                 }
             }
         }
@@ -238,7 +355,8 @@ namespace MediaDesktop.UI.ViewModels
 
         private void GlobalResources_InitializeCompleted(object sender, EventArgs e)
         {
-            MediaDesktopItemConfig.InitViewModel(); //reads configs and restores the items last time.
+            MediaDesktopItemViewModelConfig.InitViewModel(); //reads configs and restores the items last time.
+            MediaPlayingListConfig.InitViewModel();
             ViewModelItems_Favourite = new ObservableCollection<MediaDesktopItemViewModel>( ViewModelItems.Where(item => item.IsFavourite is true)); //creates favourite item collection from basic item collection.
             InitHistoryCollection();
         }
@@ -330,7 +448,7 @@ namespace MediaDesktop.UI.ViewModels
             {
                 foreach (var i in ViewModelItems)
                 {
-                    if (i.HistoryLevel < oldLevel)
+                    if (i.HistoryLevel < oldLevel && i.HistoryLevel != -1)
                     {
                         i.HistoryLevel++;
                     }
@@ -383,6 +501,26 @@ namespace MediaDesktop.UI.ViewModels
         #endregion
 
         #region Methods
+        public async void AddPlayingListViewModel(Microsoft.UI.Xaml.XamlRoot xamlRoot)
+        {
+            var model = new MediaPlayingListViewModel();
+            
+            ContentDialog contentDialog = new ContentDialog()
+            {
+                Content = new Views.Dialogs.ModifyPlayingListDialogPage() { DataContext = model, Tag = "新建播放列表" },
+                PrimaryButtonText = "新建",
+                SecondaryButtonText = "取消",
+                DefaultButton = ContentDialogButton.Primary,
+                XamlRoot = xamlRoot
+            };
+
+            var result = await contentDialog.ShowAsync();
+            if (result == ContentDialogResult.Primary)
+            {
+                MediaPlayingListViewModels.Add(model); 
+            }
+
+        }
 
         public async void AddViewModel(Microsoft.UI.Xaml.XamlRoot xamlRoot)
         {
@@ -479,6 +617,9 @@ namespace MediaDesktop.UI.ViewModels
         #endregion
 
         #region Delegate Commands
+        public DelegateCommand PlayNextCommand { get; set; }
+        public DelegateCommand PlayLastCommand { get; set; }
+        public DelegateCommand AddPlayingListViewModelCommand { get; set; }
         public DelegateCommand AddViewModelCommand { get; set; }
         public DelegateCommand EditViewModelCommand { get; set; }
         public DelegateCommand RemoveViewModelCommand { get; set; }

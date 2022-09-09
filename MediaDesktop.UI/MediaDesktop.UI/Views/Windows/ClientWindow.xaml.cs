@@ -40,6 +40,7 @@ namespace MediaDesktop.UI.Views.Windows
         private void ClientWindow_Closed(object sender, WindowEventArgs args)
         {
             GlobalResources.ViewModelCollection.SettingsItemViewModel.Save();
+            GlobalResources.ViewModelCollection.MediaPlayingListConfig.Save();
         }
     }
 }

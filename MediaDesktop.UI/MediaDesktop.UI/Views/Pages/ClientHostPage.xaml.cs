@@ -95,7 +95,10 @@ namespace MediaDesktop.UI.Views.Pages
         {
             if (isSlidingTemp && CurrentMediaRuntimeDataSet != null)
             {
-                CurrentMediaRuntimeDataSet.MediaPlayedProgress = (float)(sender as Slider).Value;
+                float value = (float)(sender as Slider).Value;
+                if (value > 0.999f)
+                    value = 0.999f;
+                CurrentMediaRuntimeDataSet.MediaPlayedProgress = value;
             }
         }
 
@@ -121,13 +124,15 @@ namespace MediaDesktop.UI.Views.Pages
 
         private void NavigationView_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
         {
-            switch((args.InvokedItemContainer as NavigationViewItem).Name)
+            switch ((args.InvokedItemContainer as NavigationViewItem).Name)
             {
                 case nameof(navigationViewItem_Lib):
-                    contentFrame.Navigate(typeof(LibraryPage));
+                    if (contentFrame.Content is not LibraryPage)
+                        contentFrame.Navigate(typeof(LibraryPage));
                     break;
                 case nameof(leftNavigationView.SettingsItem):
-                    contentFrame.Navigate(typeof(SettingsPage));
+                    if (contentFrame.Content is not SettingsPage)
+                        contentFrame.Navigate(typeof(SettingsPage));
                     break;
             }
         }

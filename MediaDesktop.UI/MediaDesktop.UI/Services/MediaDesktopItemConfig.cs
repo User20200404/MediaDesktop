@@ -10,11 +10,10 @@ using IniParser;
 using Windows.Storage;
 using MediaDesktop.UI.ViewModels;
 using System.ComponentModel;
-using MediaDesktop.UI.Services;
 
-namespace MediaDesktop.UI.Models
+namespace MediaDesktop.UI.Services
 {
-    public class MediaDesktopItemConfig
+    public class MediaDesktopItemViewModelConfig
     {
         private ViewModelCollection viewModelCollection;
         private FileIniDataParser FileIniDataParser = new FileIniDataParser();
@@ -25,13 +24,14 @@ namespace MediaDesktop.UI.Models
             get { return GlobalResources.ViewModelCollection.SettingsItemViewModel.MediaItemRecordINIPath; }
         }
 
-        public MediaDesktopItemConfig(ViewModelCollection viewModelCollection)
+        public MediaDesktopItemViewModelConfig(ViewModelCollection viewModelCollection)
         {
             this.viewModelCollection = viewModelCollection;
         }
 
         private IniData EncodeIniDataWithViewModel()
         {
+            /*
             IniData iniData = new IniData();
 
             foreach (var model in ViewModels)
@@ -46,7 +46,8 @@ namespace MediaDesktop.UI.Models
                 iniData.Sections.Add(section);
             }
 
-            return iniData;
+            return iniData;*/
+            return ViewModels.EncodeIniData();
         }
 
 
@@ -64,6 +65,7 @@ namespace MediaDesktop.UI.Models
         /// <param name="configPath">path of ini config.</param>
         public void InitViewModelWith(string configPath)
         {
+            /*
             if (System.IO.File.Exists(configPath))
             {
                 IniData iniData = FileIniDataParser.ReadFile(configPath);
@@ -86,7 +88,9 @@ namespace MediaDesktop.UI.Models
                         ViewModels.Add(viewModel);
                     }
                 }
-            }
+            }*/
+
+            ViewModels.InitMediaDesktopItemViewModelCollectionFromINI(configPath);
         }
 
         public void Save()

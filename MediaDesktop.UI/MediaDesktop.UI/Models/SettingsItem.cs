@@ -9,6 +9,7 @@ namespace MediaDesktop.UI.Models
     public class SettingsItem
     {
         public string MediaItemRecordINIPath { get; set; }
+        public string MediaPlayingListINIDir { get; set; }
         public string ExceptionLogPath { get; set; }
         public int Volume { get; set; }
         public PlayBackMode PlayBackMode { get; set; }  

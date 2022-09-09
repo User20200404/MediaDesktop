@@ -5,6 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MediaDesktop.UI.Models;
+using MediaDesktop.UI.Views.Dialogs;
+using MediaDesktop.UI.Views.Pages;
+using Microsoft.UI.Xaml.Controls;
+
 namespace MediaDesktop.UI.ViewModels
 {
     public class MediaDesktopItemViewModel : INotifyPropertyChanged
@@ -106,6 +110,7 @@ namespace MediaDesktop.UI.ViewModels
         {
             ToggleFavouriteCommand = new DelegateCommand((obj) => { ToggleFavourite(); });
             ResetHistoryLevelCommand = new DelegateCommand((obj) => { ResetHistoryLevel(); });
+            AddToMediaPlayingListCommand = new DelegateCommand((obj) => { AddToMediaPlayingList(ClientHostPage.Instance.Content.XamlRoot); });
         }
         #endregion
 
@@ -123,11 +128,50 @@ namespace MediaDesktop.UI.ViewModels
                 HistoryLevelResetRequired?.Invoke(this, EventArgs.Empty);
             }
         }
+
+        public async void AddToMediaPlayingList(Microsoft.UI.Xaml.XamlRoot xamlRoot)
+        {
+            ContentDialog dialog = new ContentDialog()
+            {
+                XamlRoot = xamlRoot,
+                Content = new AddToPlayingListDialogPage(),
+                Title = "添加到播放列表",
+                PrimaryButtonText = "添加",
+                SecondaryButtonText = "取消",
+                DefaultButton = ContentDialogButton.Primary
+            };
+
+            ContentDialogResult result = await dialog.ShowAsync();
+            if (result == ContentDialogResult.Primary)
+            {
+                ContentDialog errorDialog = new ContentDialog() { XamlRoot = xamlRoot, Title = "无法添加项目", PrimaryButtonText = "确定" };
+
+                MediaPlayingListViewModel model = (dialog.Content as AddToPlayingListDialogPage).Tag as MediaPlayingListViewModel;
+                if (model != null)
+                {
+                    if (!model.MediaItems.Contains(this))
+                    {
+                        model.MediaItems.Add(this);
+                    }
+                    else
+                    {
+                        errorDialog.Content = "播放列表中已经存在该项目。";
+                        await errorDialog.ShowAsync();
+                    }
+                }
+                else
+                {
+                    errorDialog.Content = "未选择项目。";
+                    await errorDialog.ShowAsync();
+                }
+            }
+        }
         #endregion
 
         #region Delegate Commands
         public DelegateCommand ToggleFavouriteCommand { get; set; }
         public DelegateCommand ResetHistoryLevelCommand { get; set; }
+        public DelegateCommand AddToMediaPlayingListCommand { get; set; }
         #endregion
 
         public MediaDesktopItemViewModel()

@@ -8,6 +8,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="using:MediaDesktop.UI.ViewModels"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    CacheMode="BitmapCache"
     mc:Ignorable="d">
     <Page.Resources>
         <models:IsFavouriteConverter x:Key="IsFavouriteConverter" />
@@ -15,7 +16,7 @@
         <models:VisbileIfEqualsConverter x:Key="VisbileIfEqualsConverter" />
 
         <DataTemplate x:Key="libGridViewItemTemplate" x:DataType="models:MediaDesktopItemViewModel">
-            <Grid Margin="3,3,3,3" CornerRadius="2">
+            <Grid Margin="3,3,3,3" CornerRadius="4">
                 <Image
                     Width="384"
                     Height="216"
@@ -55,7 +56,7 @@
                             VerticalAlignment="Stretch"
                             Command="{Binding MediaItemViewModel.TogglePlayStatusCommand}"
                             CommandParameter="{x:Bind global:GlobalResources.MediaDesktopPlayer}"
-                            Content="{Binding MediaItemViewModel.RuntimeDataSet.IsMediaPlaying, Converter={StaticResource IsPlayingConverter}}" />
+                            Content="{x:Bind MediaItemViewModel.RuntimeDataSet.IsMediaPlaying, Converter={StaticResource IsPlayingConverter}, Mode=OneWay}" />
                         <TextBlock
                             MaxWidth="195"
                             Margin="50,-3,0,0"
@@ -77,14 +78,136 @@
                                 </Button.Resources>
                             </Button>
 
+                            <Button Content="&#xE712;">
+                                <Button.Flyout>
+                                    <MenuFlyout>
+                                        <MenuFlyoutItem
+                                            Command="{x:Bind global:GlobalResources.ViewModelCollection.EditViewModelCommand}"
+                                            CommandParameter="{x:Bind Self}"
+                                            Text="编辑项目">
+                                            <MenuFlyoutItem.Icon>
+                                                <FontIcon Glyph="&#xE70F;" />
+                                            </MenuFlyoutItem.Icon>
+                                        </MenuFlyoutItem>
+                                        <MenuFlyoutItem
+                                            Command="{x:Bind global:GlobalResources.ViewModelCollection.RemoveViewModelCommand}"
+                                            CommandParameter="{x:Bind Self}"
+                                            Text="删除项目">
+                                            <MenuFlyoutItem.Icon>
+                                                <FontIcon Glyph="&#xE74D;" />
+                                            </MenuFlyoutItem.Icon>
+                                        </MenuFlyoutItem>
+                                        <MenuFlyoutItem
+                                            Command="{x:Bind AddToMediaPlayingListCommand}"
+                                            CommandParameter="{x:Bind Self}"
+                                            Text="添加到播放列表">
+                                            <MenuFlyoutItem.Icon>
+                                                <FontIcon Glyph="&#xF5B0;" />
+                                            </MenuFlyoutItem.Icon>
+                                        </MenuFlyoutItem>
+                                    </MenuFlyout>
+                                </Button.Flyout>
+                            </Button>
+
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </Grid>
+        </DataTemplate>
+        <DataTemplate x:Key="libGridViewItemTemplate_Favourite" x:DataType="models:MediaDesktopItemViewModel">
+            <Grid Margin="3,3,3,3" CornerRadius="4">
+                <Image
+                    Width="384"
+                    Height="216"
+                    Stretch="UniformToFill">
+                    <Image.Source>
+                        <BitmapImage UriSource="{Binding ImagePath}" />
+                    </Image.Source>
+                </Image>
+                <Rectangle
+                    Width="384"
+                    Height="216"
+                    Fill="Transparent" />
+                <Border
+                    Height="38"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Bottom"
+                    Background="{ThemeResource CustomAcrylicBrush}"
+                    BorderThickness="0"
+                    CornerRadius="0"
+                    Opacity="0.90">
+                    <Grid>
+                        <Grid.Resources>
+                            <Style TargetType="Button">
+                                <Setter Property="FontFamily" Value="Segoe MDL2 Assets" />
+                                <Setter Property="FontSize" Value="16" />
+                                <Setter Property="BorderThickness" Value="0" />
+                                <Setter Property="CornerRadius" Value="0" />
+                                <Setter Property="VerticalAlignment" Value="Stretch" />
+                                <Setter Property="Width" Value="50" />
+                                <Setter Property="Background" Value="Transparent" />
+                            </Style>
+                        </Grid.Resources>
+
+                        <Button
+                            Width="40"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Stretch"
+                            Command="{Binding MediaItemViewModel.TogglePlayStatusCommand}"
+                            CommandParameter="{x:Bind global:GlobalResources.MediaDesktopPlayer}"
+                            Content="{x:Bind MediaItemViewModel.RuntimeDataSet.IsMediaPlaying, Converter={StaticResource IsPlayingConverter}, Mode=OneWay}" />
+                        <TextBlock
+                            MaxWidth="195"
+                            Margin="50,-3,0,0"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center"
+                            FontSize="18"
+                            Text="{Binding Title}" />
+                        <StackPanel
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Stretch"
+                            Orientation="Horizontal"
+                            Spacing="0">
                             <Button
-                                Command="{x:Bind global:GlobalResources.ViewModelCollection.EditViewModelCommand}"
-                                CommandParameter="{x:Bind Self}"
-                                Content="&#xE70F;" />
-                            <Button
-                                Command="{x:Bind global:GlobalResources.ViewModelCollection.RemoveViewModelCommand}"
-                                CommandParameter="{x:Bind Self}"
-                                Content="&#xE74D;" />
+                                Command="{Binding ToggleFavouriteCommand}"
+                                Content="{Binding IsFavourite, Converter={StaticResource IsFavouriteConverter}, ConverterParameter=Icon}"
+                                Foreground="Red">
+                                <Button.Resources>
+                                    <ResourceDictionary x:Key="Default" Source="/Resources/HeartButtonForeground.xaml" />
+                                </Button.Resources>
+                            </Button>
+
+                            <Button Content="&#xE712;">
+                                <Button.Flyout>
+                                    <MenuFlyout>
+                                        <MenuFlyoutItem
+                                            Command="{x:Bind global:GlobalResources.ViewModelCollection.EditViewModelCommand}"
+                                            CommandParameter="{x:Bind Self}"
+                                            Text="编辑项目">
+                                            <MenuFlyoutItem.Icon>
+                                                <FontIcon Glyph="&#xE70F;" />
+                                            </MenuFlyoutItem.Icon>
+                                        </MenuFlyoutItem>
+                                        <MenuFlyoutItem
+                                            Command="{x:Bind global:GlobalResources.ViewModelCollection.RemoveViewModelCommand}"
+                                            CommandParameter="{x:Bind Self}"
+                                            Text="删除项目">
+                                            <MenuFlyoutItem.Icon>
+                                                <FontIcon Glyph="&#xE74D;" />
+                                            </MenuFlyoutItem.Icon>
+                                        </MenuFlyoutItem>
+                                        <MenuFlyoutItem
+                                            Command="{x:Bind AddToMediaPlayingListCommand}"
+                                            CommandParameter="{x:Bind Self}"
+                                            Text="添加到播放列表">
+                                            <MenuFlyoutItem.Icon>
+                                                <FontIcon Glyph="&#xF5B0;" />
+                                            </MenuFlyoutItem.Icon>
+                                        </MenuFlyoutItem>
+                                    </MenuFlyout>
+                                </Button.Flyout>
+                            </Button>
+
                         </StackPanel>
                     </Grid>
                 </Border>
@@ -131,7 +254,7 @@
                             VerticalAlignment="Stretch"
                             Command="{Binding MediaItemViewModel.TogglePlayStatusCommand}"
                             CommandParameter="{x:Bind global:GlobalResources.MediaDesktopPlayer}"
-                            Content="{Binding MediaItemViewModel.RuntimeDataSet.IsMediaPlaying, Converter={StaticResource IsPlayingConverter}}" />
+                            Content="{x:Bind MediaItemViewModel.RuntimeDataSet.IsMediaPlaying, Converter={StaticResource IsPlayingConverter}, Mode=OneWay}" />
                         <TextBlock
                             MaxWidth="195"
                             Margin="50,-3,0,0"
@@ -242,7 +365,7 @@
                     <GridView
                         x:Name="gridView_Favourite"
                         IsItemClickEnabled="True"
-                        ItemTemplate="{StaticResource libGridViewItemTemplate}"
+                        ItemTemplate="{StaticResource libGridViewItemTemplate_Favourite}"
                         ItemsSource="{x:Bind global:GlobalResources.ViewModelCollection.ViewModelItems_Favourite, Mode=OneWay}" />
                 </Grid>
             </PivotItem>
@@ -278,6 +401,36 @@
                         ItemsSource="{x:Bind global:GlobalResources.ViewModelCollection.ViewModelItems_History, Mode=OneWay}" />
                 </Grid>
             </PivotItem>
+
+            <PivotItem
+                x:Name="pivotItem_PlayingList"
+                FontSize="30"
+                Header="播放列表">
+                <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                    <StackPanel
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Orientation="Vertical"
+                        Visibility="{x:Bind ViewModelCollection.ViewModelItems_History.Count, Converter={StaticResource VisbileIfEqualsConverter}, ConverterParameter=0, Mode=OneWay}">
+                        <TextBlock
+                            HorizontalAlignment="Center"
+                            FontFamily="Segoe MDL2 Assets"
+                            FontSize="80"
+                            Text="&#xE823;" />
+                        <TextBlock
+                            HorizontalAlignment="Center"
+                            FontSize="20"
+                            Foreground="Gray"
+                            Text="看来你最近没有播放任何项目呢" />
+                        <TextBlock
+                            HorizontalAlignment="Center"
+                            FontSize="16"
+                            Text="挑几个喜欢的试试吧~" />
+                    </StackPanel>
+
+                    <Frame x:Name="playingListFrame" />
+                </Grid>
+            </PivotItem>
         </Pivot>
 
         <Button
@@ -302,5 +455,17 @@
             FontFamily="Segoe MDL2 Assets"
             FontSize="15"
             Visibility="{x:Bind pivot.SelectedIndex, Mode=OneWay, Converter={StaticResource VisbileIfEqualsConverter}, ConverterParameter=2}" />
+
+        <Button
+            Width="45"
+            Height="30"
+            Margin="0,15,121,0"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Top"
+            Command="{x:Bind global:GlobalResources.ViewModelCollection.AddPlayingListViewModelCommand}"
+            Content="&#xF739;"
+            FontFamily="Segoe MDL2 Assets"
+            FontSize="15"
+            Visibility="{x:Bind pivot.SelectedIndex, Mode=OneWay, Converter={StaticResource VisbileIfEqualsConverter}, ConverterParameter=3}" />
     </Grid>
 </Page>

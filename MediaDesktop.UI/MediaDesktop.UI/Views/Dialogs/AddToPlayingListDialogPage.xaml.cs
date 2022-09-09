@@ -1,6 +1,4 @@
-﻿using MediaDesktop.UI.ViewModels;
-using MediaDesktop.UI.Services;
-using Microsoft.UI.Xaml;
+﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Data;
@@ -18,18 +16,21 @@ using Windows.Foundation.Collections;
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
-namespace MediaDesktop.UI.Views.Pages
+namespace MediaDesktop.UI.Views.Dialogs
 {
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public sealed partial class LibraryPage : Page
+    public sealed partial class AddToPlayingListDialogPage : Page
     {
-        private ViewModelCollection ViewModelCollection { get { return GlobalResources.ViewModelCollection; } }
-        public LibraryPage()
+        public AddToPlayingListDialogPage()
         {
             this.InitializeComponent();
-            playingListFrame.Navigate(typeof(MediaPlayingListPage));
+        }
+
+        private void ListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            Tag = e.AddedItems.First();
         }
     }
 }

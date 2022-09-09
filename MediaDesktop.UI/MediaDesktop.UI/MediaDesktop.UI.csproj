@@ -11,10 +11,13 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Resources\HeartButtonForeground.xaml" />
+    <None Remove="Views\Dialogs\AddToPlayingListDialogPage.xaml" />
     <None Remove="Views\Dialogs\MediaInfoDialogPage.xaml" />
     <None Remove="Views\Dialogs\ModifyItemDialogPage.xaml" />
+    <None Remove="Views\Dialogs\ModifyPlayingListDialogPage.xaml" />
     <None Remove="Views\Pages\ClientHostPage.xaml" />
     <None Remove="Views\Pages\LibraryPage.xaml" />
+    <None Remove="Views\Pages\MediaPlayingListPage.xaml" />
     <None Remove="Views\Pages\SettingsHostPage.xaml" />
     <None Remove="Views\Pages\SettingsPage.xaml" />
     <None Remove="Views\Pages\SettingsPage_About.xaml" />
@@ -33,6 +36,24 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\MediaDesktop\MediaDesktop.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Views\Dialogs\AddToPlayingListDialogPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Views\Pages\MediaPlayingListPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Views\Dialogs\ModifyPlayingListDialogPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
 
   <ItemGroup>

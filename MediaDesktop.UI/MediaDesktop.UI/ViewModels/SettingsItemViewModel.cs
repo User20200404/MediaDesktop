@@ -22,6 +22,8 @@ namespace MediaDesktop.UI.ViewModels
         private SettingsItem settingsItem;
         private readonly string defaultKey = "Value";
         private readonly string defaultItemRecordPath = ApplicationData.Current.LocalFolder.Path + @"\items.ini";
+        private readonly string defaultExceptionLogPath = ApplicationData.Current.LocalFolder.Path + @"\exceptionlog.ini";
+        private readonly string defaultMediaPlayingListDir = ApplicationData.Current.LocalFolder.Path + @"\PlayingList";
         private readonly string basePath = ApplicationData.Current.LocalFolder.Path + @"\base.ini";
         private readonly string baseDirectory = ApplicationData.Current.LocalFolder.Path;
         private FileIniDataParser FileIniDataParser { get { return GlobalResources.FileIniDataParser; } }
@@ -45,6 +47,19 @@ namespace MediaDesktop.UI.ViewModels
                 {
                     settingsItem.MediaItemRecordINIPath = value;
                     OnPropertyChanged(nameof(MediaItemRecordINIPath));
+                }
+            }
+        }
+
+        public string MediaPlayingListINIDir
+        {
+            get { return settingsItem.MediaPlayingListINIDir; }
+            set
+            {
+                if (settingsItem.MediaPlayingListINIDir != value)
+                {
+                    settingsItem.MediaPlayingListINIDir = value;
+                    OnPropertyChanged(nameof(MediaPlayingListINIDir));
                 }
             }
         }
@@ -131,26 +146,59 @@ namespace MediaDesktop.UI.ViewModels
             }
         }
 
+        public async void SetExceptionLogPath()
+        {
+            FileSavePicker picker = new FileSavePicker();
+            WinUI3Helper.PickerInitializeWindow(Views.Windows.ClientWindow.Instance, picker);
+            picker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
+            picker.SuggestedFileName = "MediaDesktop.UI.ExceptionLog";
+            picker.FileTypeChoices.Add("日志文件", new List<string>() { ".ini" });
+            StorageFile file = await picker.PickSaveFileAsync();
+            if (file is not null)
+            {
+                ExceptionLogPath = file.Path;
+            }
+        }
+
+        public async void SetMediaPlayingListDir()
+        {
+            FolderPicker picker = new FolderPicker();
+            WinUI3Helper.PickerInitializeWindow(Views.Windows.ClientWindow.Instance, picker);
+            picker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
+            picker.FileTypeFilter.Add("*");
+            StorageFolder folder = await picker.PickSingleFolderAsync();
+            if (folder is not null)
+            {
+                MediaPlayingListINIDir = folder.Path;
+            }
+        }
+
         #region Delegate Command
         public DelegateCommand SwitchPlayBackModeCommand { get; set; }
         public DelegateCommand BrowseFileInExplorerCommand { get; set; }
         public DelegateCommand SetMediaRecordPathCommand { get; set; }
+        public DelegateCommand SetExceptionLogPathCommand { get; set; }
+        public DelegateCommand SetMediaPlayingListDirCommand { get; set; }
         #endregion
         private void DelegateCommandStartup()
         {
             SwitchPlayBackModeCommand = new DelegateCommand((obj) => { SwitchPlayBackMode(); });
             BrowseFileInExplorerCommand = new DelegateCommand((obj) => { BrowseFileInExplorer(obj as string); });
             SetMediaRecordPathCommand = new DelegateCommand((obj) => { SetMediaRecordPath(); });
+            SetExceptionLogPathCommand = new DelegateCommand((obj) => { SetExceptionLogPath(); });
+            SetMediaPlayingListDirCommand = new DelegateCommand((obj) => { SetMediaPlayingListDir(); });
         }
 
         public void Initialize()
         {
-            if(!File.Exists(basePath))
+            if (!File.Exists(basePath))
             {
                 File.Create(basePath).Close();
             }
             IniData iniData = FileIniDataParser.ReadFile(basePath);
             MediaItemRecordINIPath = iniData.GetValueOrDefault(nameof(MediaItemRecordINIPath), defaultKey, defaultItemRecordPath);
+            MediaPlayingListINIDir = iniData.GetValueOrDefault(nameof(MediaPlayingListINIDir), defaultKey, defaultMediaPlayingListDir);
+            ExceptionLogPath = iniData.GetValueOrDefault(nameof(ExceptionLogPath), defaultKey, defaultExceptionLogPath);
             Volume = iniData.GetIntValueOrDefault(nameof(Volume), defaultKey, 100);
             PlayBackMode = (PlayBackMode)Enum.Parse(typeof(PlayBackMode), iniData.GetValueOrDefault(nameof(PlayBackMode), defaultKey, "RepeatOne"));
         }
@@ -165,11 +213,16 @@ namespace MediaDesktop.UI.ViewModels
 
         private IniData EncodeIniData()
         {
+            
             IniData data = new IniData();
             data.Sections.AddSection(nameof(MediaItemRecordINIPath));
+            data.Sections.AddSection(nameof(MediaPlayingListINIDir));
+            data.Sections.AddSection(nameof(ExceptionLogPath));
             data.Sections.AddSection(nameof(Volume));
             data.Sections.AddSection(nameof(PlayBackMode));
             data.Sections[nameof(MediaItemRecordINIPath)].AddKey(defaultKey, MediaItemRecordINIPath);
+            data.Sections[nameof(MediaPlayingListINIDir)].AddKey(defaultKey, MediaPlayingListINIDir);
+            data.Sections[nameof(ExceptionLogPath)].AddKey(defaultKey, ExceptionLogPath);
             data.Sections[nameof(Volume)].AddKey(defaultKey, Volume.ToString());
             data.Sections[nameof(PlayBackMode)].AddKey(defaultKey, PlayBackMode.ToString());
 

@@ -83,7 +83,7 @@
                         VerticalAlignment="Center"
                         FontFamily="Segoe MDL2 Assets"
                         FontSize="20"
-                        Text="&#xE72E;" />
+                        Text="&#xE8F1;" />
                     <TextBlock
                         Grid.Column="1"
                         Margin="20,0,0,0"
@@ -103,6 +103,80 @@
                         HorizontalAlignment="Right"
                         VerticalAlignment="Center"
                         Command="{Binding SetMediaRecordPathCommand}"
+                        Content="浏览" />
+                </Grid>
+            </Border>
+
+            <Border>
+                <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="40" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
+                        FontFamily="Segoe MDL2 Assets"
+                        FontSize="20"
+                        Text="&#xEA39;" />
+                    <TextBlock
+                        Grid.Column="1"
+                        Margin="20,0,0,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Center"
+                        Text="异常日志记录文件" />
+                    <TextBox
+                        Grid.Column="2"
+                        Margin="15,0,0,0"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Center"
+                        FontSize="12"
+                        Text="{Binding ExceptionLogPath, Mode=TwoWay}" />
+                    <Button
+                        Grid.Column="3"
+                        Margin="15"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
+                        Command="{Binding SetExceptionLogPathCommand}"
+                        Content="浏览" />
+                </Grid>
+            </Border>
+
+            <Border>
+                <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="40" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
+                        FontFamily="Segoe MDL2 Assets"
+                        FontSize="20"
+                        Text="&#xE838;" />
+                    <TextBlock
+                        Grid.Column="1"
+                        Margin="20,0,0,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Center"
+                        Text="播放列表记录目录" />
+                    <TextBox
+                        Grid.Column="2"
+                        Margin="15,0,0,0"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Center"
+                        FontSize="12"
+                        Text="{Binding MediaPlayingListINIDir, Mode=TwoWay}" />
+                    <Button
+                        Grid.Column="3"
+                        Margin="15"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
+                        Command="{Binding SetMediaPlayingListDirCommand}"
                         Content="浏览" />
                 </Grid>
             </Border>

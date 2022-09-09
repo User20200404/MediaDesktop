@@ -1,6 +1,4 @@
-﻿using MediaDesktop.UI.ViewModels;
-using MediaDesktop.UI.Services;
-using Microsoft.UI.Xaml;
+﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Data;
@@ -23,13 +21,11 @@ namespace MediaDesktop.UI.Views.Pages
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public sealed partial class LibraryPage : Page
+    public sealed partial class MediaPlayingListPage : Page
     {
-        private ViewModelCollection ViewModelCollection { get { return GlobalResources.ViewModelCollection; } }
-        public LibraryPage()
+        public MediaPlayingListPage()
         {
             this.InitializeComponent();
-            playingListFrame.Navigate(typeof(MediaPlayingListPage));
         }
     }
 }

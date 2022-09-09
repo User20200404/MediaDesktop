@@ -12,11 +12,27 @@ namespace MediaDesktop
     public class MediaDesktopPlayer
     {
         private VideoView mediaPresenter;
+        private VideoView mediaPresenter_alpha;
+        private VideoView currentMediaPresenter;
         private LibVLC libVLC;
         private MediaPlayer mediaPlayer;
+        private VideoView backMediaPresenter
+        {
+            get
+            {
+                if (currentMediaPresenter == mediaPresenter)
+                {
+                    return mediaPresenter_alpha;
+                }
+                else
+                {
+                    return mediaPresenter;
+                }
+            }
+        }
 
         public event MediaPlayerChangeEventHandler MediaPlayerChanging;
-        public event MediaPlayerPlayingEventHandler MediaPlayerPlaying; 
+        public event MediaPlayerPlayingEventHandler MediaPlayerPlaying;
         public event EventHandler MediaPlayerEndReached;
 
         /// <summary>
@@ -46,7 +62,7 @@ namespace MediaDesktop
             {
                 if (mediaPlayer != value)
                 {
-                    MediaPlayerChanging?.Invoke(this, new MediaPlayerChangeEventArgs(mediaPresenter.MediaPlayer,value));
+                    MediaPlayerChanging?.Invoke(this, new MediaPlayerChangeEventArgs(backMediaPresenter.MediaPlayer,value));
                     mediaPlayer = value;
                 }
             }
@@ -57,31 +73,57 @@ namespace MediaDesktop
             MediaPlayerChanging += This_MediaPlayerChanging;
         }
 
+        /// <summary>
+        /// Switches <seealso cref="currentMediaPresenter"/> to another one.
+        /// </summary>
+        private void SwitchCurrentPresenter()
+        {
+            if (currentMediaPresenter == mediaPresenter)
+                currentMediaPresenter = mediaPresenter_alpha;
+            else currentMediaPresenter = mediaPresenter;
+        }
+
         private void This_MediaPlayerChanging(object sender, MediaPlayerChangeEventArgs args)
         {
-            args.OldMediaPlayer?.Stop();
+            args.OldMediaPlayer?.Pause();
 
-            
-            mediaPresenter.MediaPlayer = args.NewMediaPlayer;
-
+            currentMediaPresenter.MediaPlayer = args.NewMediaPlayer;
+            SwitchCurrentPresenter();
 
             if (args.NewMediaPlayer != null)
             {
                 args.NewMediaPlayer.EndReached += MediaPlayer_EndReached;
                 args.NewMediaPlayer.Playing += NewMediaPlayer_Playing;
+                args.NewMediaPlayer.PositionChanged += NewMediaPlayer_PositionChanged;
             }
 
             if(args.OldMediaPlayer != null)
             {
                 args.OldMediaPlayer.EndReached -= MediaPlayer_EndReached; 
                 args.OldMediaPlayer.Playing -= NewMediaPlayer_Playing;
+                //We unregister NewMediaPlayer.PositionChanged event at NewMediaPlayer_PositionChanged instead of here.
             }
-           
+
+        }
+
+        private void NewMediaPlayer_PositionChanged(object sender, MediaPlayerPositionChangedEventArgs e)
+        {
+            backMediaPresenter.MediaPlayer.PositionChanged -= NewMediaPlayer_PositionChanged;
+            if (currentMediaPresenter == mediaPresenter_alpha)
+            {
+                mediaPresenter.Show();
+                mediaPresenter_alpha.MediaPlayer?.Stop();
+            }
+            else
+            {
+                mediaPresenter.Hide();
+                mediaPresenter.MediaPlayer?.Stop();
+            }
         }
 
         private void NewMediaPlayer_Playing(object sender, EventArgs e)
         {
-            MediaPlayerPlaying?.Invoke(this, MediaPlayer);
+            MediaPlayerPlaying?.Invoke(this, backMediaPresenter.MediaPlayer);
         }
 
         private void MediaPlayer_EndReached(object sender, EventArgs e)
@@ -97,6 +139,15 @@ namespace MediaDesktop
             mediaPresenter.Width = screenWidth;
             mediaPresenter.Left = 0;
             mediaPresenter.Top = 0;
+
+            mediaPresenter_alpha = new VideoView();
+            mediaPresenter_alpha.MediaPlayer = mediaPlayer;
+            mediaPresenter_alpha.Height = screenHeight;
+            mediaPresenter_alpha.Width = screenWidth;
+            mediaPresenter_alpha.Left = 0;
+            mediaPresenter_alpha.Top = 0;
+
+            currentMediaPresenter = mediaPresenter;
         }
 
         /// <summary>
@@ -169,8 +220,10 @@ namespace MediaDesktop
         /// <param name="mediaDesktopBase"></param>
         public void AttachToMediaDesktopBase(MediaDesktopBase mediaDesktopBase)
         {
+            SystemAPIs.SetParent(mediaPresenter_alpha.Handle, mediaDesktopBase.AttachmentHandlerForm.Handle);
             SystemAPIs.SetParent(mediaPresenter.Handle, mediaDesktopBase.AttachmentHandlerForm.Handle);
             mediaPresenter.Show();
+            mediaPresenter_alpha.Show();
         }
     }
 

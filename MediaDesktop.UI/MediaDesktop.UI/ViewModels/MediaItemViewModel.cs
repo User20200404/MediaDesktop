@@ -9,6 +9,7 @@ using LibVLCSharp.Shared;
 using System.Drawing;
 using MediaDesktop.UI.Services;
 using Microsoft.UI.Xaml.Controls;
+using System.Threading;
 
 namespace MediaDesktop.UI.ViewModels
 {
@@ -72,8 +73,15 @@ namespace MediaDesktop.UI.ViewModels
 
         public void PlayMedia(MediaDesktopPlayer player)
         {
+
+            var parentDesktopViewModel = GlobalResources.ViewModelCollection.ViewModelItems.First(i => i.MediaItemViewModel == this);
+            if (!GlobalResources.ViewModelCollection.CurrentPlayingList.Contains(parentDesktopViewModel))
+            {
+                GlobalResources.ViewModelCollection.CurrentPlayingList.Add(parentDesktopViewModel);
+            }
             player.MediaPlayer = RuntimeDataSet.MediaPlayer;
             player.Play();
+
         }
 
         public void PauseMedia(MediaDesktopPlayer player)
@@ -127,6 +135,33 @@ namespace MediaDesktop.UI.ViewModels
             await contentDialog.ShowAsync();
         }
 
+        public void PlayWithMediaList(MediaDesktopPlayer player,MediaPlayingListViewModel list)
+        {
+            var desktopItem = list.MediaItems.FirstOrDefault(i => i.MediaItemViewModel == this);
+            if(desktopItem == default(MediaDesktopItemViewModel))
+            {
+                throw new Exception(nameof(PlayWithMediaList) + ": This method could only be invoked where current MediaItemViewModel is included in the given list.");
+            }
+            else
+            {
+                GlobalResources.ViewModelCollection.CurrentPlayingList.Clear();
+                int index = list.MediaItems.IndexOf(desktopItem);
+                
+                //Refill CurrentPlayingList with the items in list, where ordering begins at desktopItem.
+                foreach (var item in list.MediaItems.Where(i => list.MediaItems.IndexOf(i) >= index))
+                {
+                    GlobalResources.ViewModelCollection.CurrentPlayingList.Add(item);
+                }
+
+                foreach (var item in list.MediaItems.Where(i => list.MediaItems.IndexOf(i) < index))
+                {
+                    GlobalResources.ViewModelCollection.CurrentPlayingList.Add(item);
+                }
+
+                desktopItem.MediaItemViewModel.PlayMedia(GlobalResources.MediaDesktopPlayer);
+            }
+        }
+
         public void BrowseMediaFileInExplorer()
         {
             WinUI3Helper.SelectFileInExplorer(MediaPath);
@@ -139,6 +174,7 @@ namespace MediaDesktop.UI.ViewModels
         public DelegateCommand PlayMediaCommand { get; set; }
         public DelegateCommand PauseMediaCommand { get; set; }
         public DelegateCommand StopMediaCommand { get; set; }
+        public DelegateCommand PlayWithMediaListCommand { get; set; }
         public DelegateCommand TogglePlayStatusCommand { get; set; }
         public DelegateCommand ToggleMediaStatusToCommand { get; set; }
         public DelegateCommand ShowMediaInfoDialogCommand { get; set; }
@@ -157,6 +193,7 @@ namespace MediaDesktop.UI.ViewModels
             PlayMediaCommand = new DelegateCommand((obj) => { PlayMedia(obj as MediaDesktopPlayer); });
             PauseMediaCommand = new DelegateCommand((obj) => { PauseMedia(obj as MediaDesktopPlayer); });
             StopMediaCommand = new DelegateCommand((obj) => { StopMedia(obj as MediaDesktopPlayer); });
+            PlayWithMediaListCommand = new DelegateCommand((obj) => { PlayWithMediaList(GlobalResources.MediaDesktopPlayer, obj as MediaPlayingListViewModel); });
             TogglePlayStatusCommand = new DelegateCommand((obj) => { TogglePlayStatus(obj as MediaDesktopPlayer); });
             ToggleMediaStatusToCommand = new DelegateCommand((obj) => { var data = (ToggleMediaStatusData)obj; ToggleMediaStatusTo(data.Player, data.Action); });
             ShowMediaInfoDialogCommand = new DelegateCommand((obj) => { ShowMediaInfoDialog(Views.Pages.ClientHostPage.Instance.XamlRoot); });

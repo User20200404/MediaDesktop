@@ -45,10 +45,12 @@
                     <Setter Property="Width" Value="50" />
                     <Setter Property="Height" Value="33" />
                     <Setter Property="FontSize" Value="12" />
+                    <Setter Property="CornerRadius" Value="4" />
                 </Style>
                 <Style TargetType="TextBox">
                     <Setter Property="MinWidth" Value="350" />
                     <Setter Property="MaxWidth" Value="350" />
+                    <Setter Property="CornerRadius" Value="4" />
                 </Style>
             </StackPanel.Resources>
             <StackPanel Orientation="Horizontal" Spacing="5">
@@ -84,7 +86,7 @@
             Height="180"
             BorderBrush="Gray"
             BorderThickness="1"
-            CornerRadius="2">
+            CornerRadius="4">
             <Image Source="{Binding ImagePath}" />
         </Border>
     </Grid>

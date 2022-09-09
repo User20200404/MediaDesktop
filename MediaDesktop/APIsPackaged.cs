@@ -51,6 +51,11 @@ namespace MediaDesktop
             width = Screen.PrimaryScreen.Bounds.Width;
         }
 
+        public static Boolean ShowWindow(IntPtr windowHandle)
+        {
+            return SystemAPIs.ShowWindow(windowHandle, 8);
+        }
+
         public static Boolean HideWindow(IntPtr windowHandle)
         {
             return SystemAPIs.ShowWindow(windowHandle, 0);

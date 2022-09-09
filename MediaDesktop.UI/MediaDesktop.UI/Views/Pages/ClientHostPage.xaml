@@ -91,18 +91,20 @@
                             <Button
                                 Width="40"
                                 Height="40"
+                                Command="{x:Bind global:GlobalResources.ViewModelCollection.PlayLastCommand}"
                                 Content="&#xE892;"
                                 CornerRadius="20" />
                             <Button
                                 Width="50"
                                 Height="50"
                                 Command="{x:Bind global:GlobalResources.ViewModelCollection.CurrentDesktopItemViewModel.MediaItemViewModel.TogglePlayStatusCommand, Mode=OneWay}"
-                                CommandParameter="{x:Bind global:GlobalResources.MediaDesktopPlayer, Mode=OneTime}"
+                                CommandParameter="{x:Bind global:GlobalResources.MediaDesktopPlayer, Mode=OneWay}"
                                 Content="{x:Bind global:GlobalResources.ViewModelCollection.CurrentDesktopItemViewModel.MediaItemViewModel.RuntimeDataSet.IsMediaPlaying, Converter={StaticResource IsPlayingConverter}, Mode=OneWay}"
                                 CornerRadius="25" />
                             <Button
                                 Width="40"
                                 Height="40"
+                                Command="{x:Bind global:GlobalResources.ViewModelCollection.PlayNextCommand}"
                                 Content="&#xE893;"
                                 CornerRadius="20" />
                         </StackPanel>
