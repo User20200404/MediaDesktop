@@ -7,14 +7,18 @@
     xmlns:local="using:MediaDesktop.UI.Views.Pages"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="using:MediaDesktop.UI.ViewModels"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    Background="Transparent"
     CacheMode="BitmapCache"
     mc:Ignorable="d">
     <Page.Resources>
         <models:IsFavouriteConverter x:Key="IsFavouriteConverter" />
         <models:IsPlayingConverter x:Key="IsPlayingConverter" />
         <models:VisbileIfEqualsConverter x:Key="VisbileIfEqualsConverter" />
-
+        <Style TargetType="GridView">
+            <Setter Property="CanDragItems" Value="True" />
+            <Setter Property="CanReorderItems" Value="True" />
+            <Setter Property="AllowDrop" Value="True" />
+        </Style>
         <DataTemplate x:Key="libGridViewItemTemplate" x:DataType="models:MediaDesktopItemViewModel">
             <Grid Margin="3,3,3,3" CornerRadius="4">
                 <Image
@@ -28,7 +32,9 @@
                 <Rectangle
                     Width="384"
                     Height="216"
-                    Fill="Transparent" />
+                    DoubleTapped="LibraryItem_DoubleTapped"
+                    Fill="Transparent"
+                    IsDoubleTapEnabled="True" />
                 <Border
                     Height="38"
                     HorizontalAlignment="Stretch"
@@ -127,7 +133,9 @@
                 <Rectangle
                     Width="384"
                     Height="216"
-                    Fill="Transparent" />
+                    DoubleTapped="LibraryItem_DoubleTapped"
+                    Fill="Transparent"
+                    IsDoubleTapEnabled="True" />
                 <Border
                     Height="38"
                     HorizontalAlignment="Stretch"
@@ -226,7 +234,9 @@
                 <Rectangle
                     Width="384"
                     Height="216"
-                    Fill="Transparent" />
+                    DoubleTapped="LibraryItem_DoubleTapped"
+                    Fill="Transparent"
+                    IsDoubleTapEnabled="True" />
                 <Border
                     Height="38"
                     HorizontalAlignment="Stretch"
@@ -298,7 +308,8 @@
             Title="库"
             Grid.Row="0"
             HorizontalAlignment="Stretch"
-            VerticalAlignment="Stretch">
+            VerticalAlignment="Stretch"
+            SelectedIndex="{x:Bind global:GlobalResources.ViewModelCollection.SettingsItemViewModel.LastLibraryPagePivotIndex, Mode=TwoWay}">
             <PivotItem
                 x:Name="pivotItem_All"
                 FontSize="30"
@@ -326,9 +337,6 @@
                     </StackPanel>
                     <GridView
                         x:Name="gridView_All"
-                        AllowDrop="True"
-                        CanDragItems="True"
-                        CanReorderItems="True"
                         IsItemClickEnabled="True"
                         ItemTemplate="{StaticResource libGridViewItemTemplate}"
                         ItemsSource="{x:Bind global:GlobalResources.ViewModelCollection.ViewModelItems}" />
@@ -396,6 +404,7 @@
                     </StackPanel>
 
                     <GridView
+                        CanReorderItems="False"
                         IsItemClickEnabled="True"
                         ItemTemplate="{StaticResource libGridViewItemTemplate_History}"
                         ItemsSource="{x:Bind global:GlobalResources.ViewModelCollection.ViewModelItems_History, Mode=OneWay}" />
@@ -404,6 +413,8 @@
 
             <PivotItem
                 x:Name="pivotItem_PlayingList"
+                HorizontalContentAlignment="Stretch"
+                VerticalContentAlignment="Stretch"
                 FontSize="30"
                 Header="播放列表">
                 <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
@@ -411,21 +422,21 @@
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"
                         Orientation="Vertical"
-                        Visibility="{x:Bind ViewModelCollection.ViewModelItems_History.Count, Converter={StaticResource VisbileIfEqualsConverter}, ConverterParameter=0, Mode=OneWay}">
+                        Visibility="{x:Bind ViewModelCollection.MediaPlayingListViewModels.Count, Converter={StaticResource VisbileIfEqualsConverter}, ConverterParameter=0, Mode=OneWay}">
                         <TextBlock
                             HorizontalAlignment="Center"
                             FontFamily="Segoe MDL2 Assets"
                             FontSize="80"
-                            Text="&#xE823;" />
+                            Text="&#xE7BC;" />
                         <TextBlock
                             HorizontalAlignment="Center"
                             FontSize="20"
                             Foreground="Gray"
-                            Text="看来你最近没有播放任何项目呢" />
+                            Text="播放列表空空如也" />
                         <TextBlock
                             HorizontalAlignment="Center"
                             FontSize="16"
-                            Text="挑几个喜欢的试试吧~" />
+                            Text="点击右上角按钮添加播放列表" />
                     </StackPanel>
 
                     <Frame x:Name="playingListFrame" />
@@ -463,9 +474,34 @@
             HorizontalAlignment="Right"
             VerticalAlignment="Top"
             Command="{x:Bind global:GlobalResources.ViewModelCollection.AddPlayingListViewModelCommand}"
-            Content="&#xF739;"
+            Content="&#xE8F4;"
             FontFamily="Segoe MDL2 Assets"
             FontSize="15"
             Visibility="{x:Bind pivot.SelectedIndex, Mode=OneWay, Converter={StaticResource VisbileIfEqualsConverter}, ConverterParameter=3}" />
+
+
+        <Border
+            x:Name="loadingProgressRingCover"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch"
+            Background="#99000000"
+            BorderThickness="0"
+            CornerRadius="0">
+            <Grid>
+                <ProgressRing
+                    x:Name="loadingProgressRing"
+                    Width="60"
+                    Height="60"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    IsActive="True" />
+                <TextBlock
+                    Margin="0,80,0,0"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    FontSize="13"
+                    Text="加载LibVLCsharp组件......" />
+            </Grid>
+        </Border>
     </Grid>
 </Page>

@@ -5,18 +5,25 @@ using System.Windows.Forms;
 using System.IO;
 using LibVLCSharp.Shared;
 using LibVLCSharp.WinForms;
+using WindowManager;
+using System.Runtime.InteropServices;
+using System.Diagnostics;
+
 namespace MediaDesktop
 {
-    public delegate void MediaPlayerChangeEventHandler(object sender,MediaPlayerChangeEventArgs args);
+    public delegate void MediaPlayerChangeEventHandler(object sender, MediaPlayerChangeEventArgs args);
     public delegate void MediaPlayerPlayingEventHandler(object sender, MediaPlayer args);
     public class MediaDesktopPlayer
     {
+        private IntPtr hProgManHook, hReceiverHook;
+        private bool lockMediaPlayer;
         private VideoView mediaPresenter;
         private VideoView mediaPresenter_alpha;
         private VideoView currentMediaPresenter;
         private LibVLC libVLC;
         private MediaPlayer mediaPlayer;
-        private VideoView backMediaPresenter
+
+        private VideoView BackMediaPresenter
         {
             get
             {
@@ -30,7 +37,7 @@ namespace MediaDesktop
                 }
             }
         }
-
+        public event EventHandler ScreenSolutionChanged;
         public event MediaPlayerChangeEventHandler MediaPlayerChanging;
         public event MediaPlayerPlayingEventHandler MediaPlayerPlaying;
         public event EventHandler MediaPlayerEndReached;
@@ -60,9 +67,12 @@ namespace MediaDesktop
             get { return mediaPlayer; }
             set
             {
+                if (lockMediaPlayer is true) return;
+
                 if (mediaPlayer != value)
                 {
-                    MediaPlayerChanging?.Invoke(this, new MediaPlayerChangeEventArgs(backMediaPresenter.MediaPlayer,value));
+                    lockMediaPlayer = true;
+                    MediaPlayerChanging?.Invoke(this, new MediaPlayerChangeEventArgs(BackMediaPresenter.MediaPlayer, value));
                     mediaPlayer = value;
                 }
             }
@@ -71,7 +81,41 @@ namespace MediaDesktop
         private void EventStartup()
         {
             MediaPlayerChanging += This_MediaPlayerChanging;
+            ReceiverForm.Instance.ScreenSolutionChanged += System_ScreenSolutionChanged;
+
+            //const int WH_CALLWNDPROC = 12;
+
+            //int msgReceiverTid = APIsPackaged.GetThreadIdByWindowHandle(messageReceiver.Handle);
+            //hReceiverHook = SystemAPIs.SetWindowsHookExA(WH_CALLWNDPROC, WndProcCallBack, IntPtr.Zero, msgReceiverTid);
+            //Install hook to handle screenSolution changed events.
+            //the target is current thread so hInstance should be zero.
+
+            //IntPtr hwnd = APIsPackaged.FindProgramManagers()[0];
+            //int tid = APIsPackaged.GetThreadIdByWindowHandle(hwnd);
+            //IntPtr hDll = SystemAPIs.LoadLibraryA(Application.StartupPath + "Resources\\WndCallBack.dll");
+            //Debug.WriteLine( Marshal.GetLastWin32Error());
+            //IntPtr hFunc = SystemAPIs.GetProcAddress(hDll, "ResizeWndCallBack");
+            //hProgManHook = SystemAPIs.SetWindowsHookExA(WH_CALLWNDPROC, hFunc, hDll, tid);
+            //SystemAPIs.FreeLibrary(hDll);
         }
+
+        private void System_ScreenSolutionChanged(object sender, EventArgs e)
+        {
+            ResizePlayerToScreen();
+            ScreenSolutionChanged(sender,e);
+        }
+
+        //private unsafe int WndProcCallBack(int nCode, uint wParam, IntPtr lParam)
+        //{
+        //    const int WM_USER_RESIZE = 1025;
+        //    const int WM_SOLUTIONCHANGED = 0x007e;
+        //    WIN32tagCWPRETSTRUCT* wndStruct = (WIN32tagCWPRETSTRUCT*)lParam;
+        //    if (wndStruct->message == WM_SOLUTIONCHANGED)
+        //    {
+        //        ResizePlayerToScreen();
+        //    }
+        //    return 0;
+        //}
 
         /// <summary>
         /// Switches <seealso cref="currentMediaPresenter"/> to another one.
@@ -83,9 +127,15 @@ namespace MediaDesktop
             else currentMediaPresenter = mediaPresenter;
         }
 
+        /// <summary>
+        /// Deals with the mediaplayer change events.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
         private void This_MediaPlayerChanging(object sender, MediaPlayerChangeEventArgs args)
         {
-            args.OldMediaPlayer?.Pause();
+            //Without this command, MediaDesktop.UI may mistakenly recognize the CurrentPlayingItem (the first item where IsMediaPlaying == true).
+            //args.OldMediaPlayer?.Pause();
 
             currentMediaPresenter.MediaPlayer = args.NewMediaPlayer;
             SwitchCurrentPresenter();
@@ -106,9 +156,16 @@ namespace MediaDesktop
 
         }
 
+
+        /// <summary>
+        /// To ensure the new media playback started, use this event to switch mediaPresenter properly.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void NewMediaPlayer_PositionChanged(object sender, MediaPlayerPositionChangedEventArgs e)
         {
-            backMediaPresenter.MediaPlayer.PositionChanged -= NewMediaPlayer_PositionChanged;
+            BackMediaPresenter.MediaPlayer.PositionChanged -= NewMediaPlayer_PositionChanged;
+            lockMediaPlayer = false;
             if (currentMediaPresenter == mediaPresenter_alpha)
             {
                 mediaPresenter.Show();
@@ -123,7 +180,7 @@ namespace MediaDesktop
 
         private void NewMediaPlayer_Playing(object sender, EventArgs e)
         {
-            MediaPlayerPlaying?.Invoke(this, backMediaPresenter.MediaPlayer);
+            MediaPlayerPlaying?.Invoke(this, BackMediaPresenter.MediaPlayer);
         }
 
         private void MediaPlayer_EndReached(object sender, EventArgs e)
@@ -131,21 +188,32 @@ namespace MediaDesktop
             MediaPlayerEndReached?.Invoke(this, EventArgs.Empty);   
         }
 
-        private void PlayerStartup(int screenWidth, int screenHeight)
+        public void ResizePlayerToScreen()
         {
-            mediaPresenter = new VideoView();
-            mediaPresenter.MediaPlayer = mediaPlayer;
-            mediaPresenter.Height = screenHeight;
-            mediaPresenter.Width = screenWidth;
+            APIsPackaged.GetScreenResolution(out int width, out int height);
+            ResizePlayer(width, height);
+        }
+
+        public void ResizePlayer(int screenWidth,int screenHeight)
+        {
+            mediaPresenter.Height = screenHeight + 5;
+            mediaPresenter.Width = screenWidth + 5;
             mediaPresenter.Left = 0;
             mediaPresenter.Top = 0;
 
-            mediaPresenter_alpha = new VideoView();
-            mediaPresenter_alpha.MediaPlayer = mediaPlayer;
-            mediaPresenter_alpha.Height = screenHeight;
-            mediaPresenter_alpha.Width = screenWidth;
+            mediaPresenter_alpha.Height = screenHeight + 5;
+            mediaPresenter_alpha.Width = screenWidth + 5;
             mediaPresenter_alpha.Left = 0;
             mediaPresenter_alpha.Top = 0;
+        }
+
+        private void PlayerStartup()
+        {
+            mediaPresenter = new VideoView();
+            mediaPresenter.MediaPlayer = mediaPlayer;
+
+            mediaPresenter_alpha = new VideoView();
+            mediaPresenter_alpha.MediaPlayer = mediaPlayer;
 
             currentMediaPresenter = mediaPresenter;
         }
@@ -157,7 +225,8 @@ namespace MediaDesktop
         {
             Control.CheckForIllegalCrossThreadCalls = false;
             APIsPackaged.GetScreenResolution(out int width, out int height);
-            PlayerStartup(width, height);
+            PlayerStartup();
+            ResizePlayer(width, height);
             EventStartup();
         }
 
@@ -187,6 +256,8 @@ namespace MediaDesktop
         /// <returns>A boolean value that indicates the success status of this operation.</returns>
         public bool Play()
         {
+            if (mediaPlayer is null)
+                return false;
            return mediaPlayer.Play();
         }
 
@@ -196,6 +267,9 @@ namespace MediaDesktop
         /// <exception cref="InvalidOperationException"></exception>
         public void Pause()
         {
+            if (mediaPlayer is null)
+                return;
+
             if (mediaPlayer.CanPause)
             {
                 mediaPlayer.SetPause(true);
@@ -206,11 +280,26 @@ namespace MediaDesktop
             }
         }
 
+        public bool TryPause()
+        {
+            try
+            {
+                Pause();
+                return true;
+            }
+            catch(Exception ex)
+            {
+                return false;
+            }
+        }
+
         /// <summary>
         /// Stop the current media playing. the progress of playing will be reset.This method may block current thread.
         /// </summary>
         public void Stop()
         {
+            if (mediaPlayer is null)
+                return;
             mediaPlayer.Stop();
         }
 

@@ -58,8 +58,17 @@
         </DataTemplate>
     </Page.Resources>
     <Grid>
+        <TextBlock
+            x:Name="statusTextBlock"
+            Margin="20,0,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Bottom"
+            FontSize="15"
+            Foreground="OrangeRed"
+            Text="未选择播放列表。" />
         <ListView
             x:Name="listView"
+            Margin="10,10,10,20"
             IsItemClickEnabled="True"
             ItemTemplate="{StaticResource playingListTemplate}"
             ItemsSource="{x:Bind global:GlobalResources.ViewModelCollection.MediaPlayingListViewModels, Mode=OneWay}"

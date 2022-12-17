@@ -7,7 +7,9 @@
     xmlns:local="using:MediaDesktop.UI.Views.Pages"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="using:MediaDesktop.UI.ViewModels"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    CacheMode="BitmapCache"
+    NavigationCacheMode="Enabled"
+    Background="Transparent"
     mc:Ignorable="d">
 
     <Grid>

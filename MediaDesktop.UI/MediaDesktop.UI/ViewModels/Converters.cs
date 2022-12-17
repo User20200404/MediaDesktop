@@ -1,10 +1,13 @@
 ﻿using MediaDesktop.UI.Models;
+using MediaDesktop.UI.Services;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Media.Imaging;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -166,20 +169,20 @@ namespace MediaDesktop.UI.ViewModels
         public object Convert(object value, Type targetType, object parameter, string language)
         {
             int volume = (int)value;
-            
-            if(volume == 0)
+
+            if (volume == 0)
             {
                 return "\xE992";
             }
-            if(volume>0 && volume<=33)
+            if (volume > 0 && volume <= 33)
             {
                 return "\xE993";
             }
-            if(volume>33&&volume<=66)
+            if (volume > 33 && volume <= 66)
             {
                 return "\xE994";
             }
-            if(volume>66&&volume<=100)
+            if (volume > 66 && volume <= 100)
             {
                 return "\xE995";
             }
@@ -218,7 +221,7 @@ namespace MediaDesktop.UI.ViewModels
     {
         public object Convert(object value, Type targetType, object parameter, string language)
         {
-            if(value.ToString() == parameter.ToString())
+            if (value.ToString() == parameter.ToString())
             {
                 return Visibility.Visible;
             }
@@ -233,6 +236,35 @@ namespace MediaDesktop.UI.ViewModels
             throw new NotImplementedException();
         }
     }
+    public class ImageSourceOrDefaultConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, string language)
+        {
+            string path = value as string;
+            ImageSource source;
+            var cache = GlobalResources.ImageCaches.FirstOrDefault(i => i.ImagePath == path);
+            if (cache is not null)
+            {
+                cache.TryLoadImage();
+                source = cache.Image;
+            }
+            else
+            {
+                ImageCache newCache = new ImageCache() { ImagePath = path };
+                newCache.TryLoadImage();
+                if(newCache.Image is not null)
+                {
+                    GlobalResources.ImageCaches.Add(newCache);
+                }
+                source = newCache.Image;
+            }
+            return source;
+        }
 
+        public object ConvertBack(object value, Type targetType, object parameter, string language)
+        {
+            throw new NotImplementedException();
+        }
+    }
 
 }

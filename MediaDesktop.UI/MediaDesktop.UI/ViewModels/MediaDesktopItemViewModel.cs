@@ -140,8 +140,11 @@ namespace MediaDesktop.UI.ViewModels
                 SecondaryButtonText = "取消",
                 DefaultButton = ContentDialogButton.Primary
             };
+            (dialog.Content as AddToPlayingListDialogPage).Tag = this;
 
-            ContentDialogResult result = await dialog.ShowAsync();
+            await dialog.ShowAsync();
+
+            /*
             if (result == ContentDialogResult.Primary)
             {
                 ContentDialog errorDialog = new ContentDialog() { XamlRoot = xamlRoot, Title = "无法添加项目", PrimaryButtonText = "确定" };
@@ -164,7 +167,7 @@ namespace MediaDesktop.UI.ViewModels
                     errorDialog.Content = "未选择项目。";
                     await errorDialog.ShowAsync();
                 }
-            }
+            }*/
         }
         #endregion
 

@@ -8,7 +8,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="using:MediaDesktop.UI.ViewModels"
     d:DataContext="{d:DesignInstance Type=vm:SettingsItemViewModel}"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    Background="Transparent"
     DataContext="{x:Bind global:GlobalResources.ViewModelCollection.SettingsItemViewModel, Mode=OneWay}"
     mc:Ignorable="d">
 
@@ -17,12 +17,12 @@
             HorizontalAlignment="Stretch"
             VerticalAlignment="Top"
             Orientation="Vertical"
-            Spacing="3">
+            Spacing="4">
             <StackPanel.Resources>
                 <Style TargetType="Border">
                     <Setter Property="CornerRadius" Value="2" />
                     <Setter Property="BorderThickness" Value="0" />
-                    <Setter Property="Background" Value="#FF2B2B2B" />
+                    <Setter Property="Background" Value="{ThemeResource ButtonBackground}" />
                     <Setter Property="Height" Value="65" />
                     <Setter Property="Margin" Value="5,0,5,0" />
                     <Setter Property="HorizontalAlignment" Value="Stretch" />
@@ -55,7 +55,7 @@
                         VerticalAlignment="Center"
                         TextWrapping="Wrap">
                         <Paragraph>
-                            <Run Foreground="Gray" Text="{Binding BasePath}" />
+                            <Run Foreground="#BBBBBB" Text="{Binding BasePath}" />
                         </Paragraph>
                     </RichTextBlock>
                     <Button

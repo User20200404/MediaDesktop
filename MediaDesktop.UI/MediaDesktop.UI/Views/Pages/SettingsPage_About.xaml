@@ -5,7 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:MediaDesktop.UI.Views.Pages"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    Background="Transparent"
     mc:Ignorable="d">
 
     <Grid>
@@ -51,11 +51,11 @@
                     <StackPanel Orientation="Vertical">
                         <StackPanel.Resources>
                             <Style TargetType="RichTextBlock">
-                                <Setter Property="Foreground" Value="Gray" />
+                                <Setter Property="Foreground" Value="{ThemeResource AccentTextFillColorPrimaryBrush}" />
                             </Style>
                         </StackPanel.Resources>
                         <RichTextBlock>
-                            <Paragraph>贾聪毅</Paragraph>
+                            <Paragraph>贾聪毅（2022年了还在用ini存设置的屑）</Paragraph>
                         </RichTextBlock>
                         <RichTextBlock>
                             <Paragraph>西北工业大学</Paragraph>

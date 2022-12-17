@@ -9,5 +9,38 @@
     xmlns:vm="using:MediaDesktop.UI.ViewModels"
     xmlns:vp="using:MediaDesktop.UI.Views.Pages"
     mc:Ignorable="d">
-    <Frame x:Name="mainContentFrame" />
+    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <!--<Image
+            Grid.RowSpan="3"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch"
+            d:DataContext="{d:DesignInstance Type=vm:MediaDesktopItemViewModel}"
+            DataContext="{x:Bind global:GlobalResources.ViewModelCollection.CurrentDesktopItemViewModel, Mode=OneWay}"
+            Source="{Binding ImagePath, Converter={StaticResource ImageSourceConverter}}"
+            Stretch="UniformToFill" />
+        <Rectangle
+            Grid.RowSpan="3"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch">
+            <Rectangle.Fill>
+                <AcrylicBrush TintColor="{ThemeResource SystemAccentColor}" TintOpacity="0.15" />
+            </Rectangle.Fill>
+        </Rectangle>-->
+
+
+        <Border
+            x:Name="border1"
+            Height="30"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Top"
+            Background="Transparent"
+            BorderThickness="0">
+            <TextBlock
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Foreground="Snow"
+                Text="桌面视频播放器(Alpha)" />
+        </Border>
+        <Frame x:Name="mainContentFrame" Margin="0,30,0,0" />
+    </Grid>
 </Window>

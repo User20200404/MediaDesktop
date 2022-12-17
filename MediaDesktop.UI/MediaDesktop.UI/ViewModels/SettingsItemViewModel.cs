@@ -87,6 +87,32 @@ namespace MediaDesktop.UI.ViewModels
             }
         }
 
+        public float SpeedRatio
+        {
+            get { return settingsItem.SpeedRatio; }
+            set
+            {
+                if (settingsItem.SpeedRatio != value)
+                {
+                    settingsItem.SpeedRatio = value;
+                    OnPropertyChanged(nameof(SpeedRatio));
+                }
+            }
+        }
+
+        public int LastLibraryPagePivotIndex
+        {
+            get { return settingsItem.LastLibraryPagePivotIndex; }
+            set
+            {
+                if (settingsItem.LastLibraryPagePivotIndex != value)
+                {
+                    settingsItem.LastLibraryPagePivotIndex = value;
+                    OnPropertyChanged(nameof(LastLibraryPagePivotIndex));
+                }
+            }
+        }
+
         public PlayBackMode PlayBackMode
         {
             get { return settingsItem.PlayBackMode; }
@@ -172,13 +198,15 @@ namespace MediaDesktop.UI.ViewModels
                 MediaPlayingListINIDir = folder.Path;
             }
         }
+       
 
         #region Delegate Command
-        public DelegateCommand SwitchPlayBackModeCommand { get; set; }
-        public DelegateCommand BrowseFileInExplorerCommand { get; set; }
-        public DelegateCommand SetMediaRecordPathCommand { get; set; }
-        public DelegateCommand SetExceptionLogPathCommand { get; set; }
-        public DelegateCommand SetMediaPlayingListDirCommand { get; set; }
+        public DelegateCommand SwitchPlayBackModeCommand { get; private set; }
+        public DelegateCommand BrowseFileInExplorerCommand { get; private set; }
+        public DelegateCommand SetMediaRecordPathCommand { get; private set; }
+        public DelegateCommand SetExceptionLogPathCommand { get; private set; }
+        public DelegateCommand SetMediaPlayingListDirCommand { get; private set; }
+        public DelegateCommand SetSpeedRatioCommand { get; private set; }
         #endregion
         private void DelegateCommandStartup()
         {
@@ -187,6 +215,7 @@ namespace MediaDesktop.UI.ViewModels
             SetMediaRecordPathCommand = new DelegateCommand((obj) => { SetMediaRecordPath(); });
             SetExceptionLogPathCommand = new DelegateCommand((obj) => { SetExceptionLogPath(); });
             SetMediaPlayingListDirCommand = new DelegateCommand((obj) => { SetMediaPlayingListDir(); });
+            SetSpeedRatioCommand = new DelegateCommand(obj => SpeedRatio = Convert.ToSingle(obj));
         }
 
         public void Initialize()
@@ -196,11 +225,13 @@ namespace MediaDesktop.UI.ViewModels
                 File.Create(basePath).Close();
             }
             IniData iniData = FileIniDataParser.ReadFile(basePath);
-            MediaItemRecordINIPath = iniData.GetValueOrDefault(nameof(MediaItemRecordINIPath), defaultKey, defaultItemRecordPath);
-            MediaPlayingListINIDir = iniData.GetValueOrDefault(nameof(MediaPlayingListINIDir), defaultKey, defaultMediaPlayingListDir);
-            ExceptionLogPath = iniData.GetValueOrDefault(nameof(ExceptionLogPath), defaultKey, defaultExceptionLogPath);
-            Volume = iniData.GetIntValueOrDefault(nameof(Volume), defaultKey, 100);
-            PlayBackMode = (PlayBackMode)Enum.Parse(typeof(PlayBackMode), iniData.GetValueOrDefault(nameof(PlayBackMode), defaultKey, "RepeatOne"));
+            MediaItemRecordINIPath = iniData.GetStringValueOrDefault(nameof(MediaItemRecordINIPath), defaultKey, defaultItemRecordPath);
+            MediaPlayingListINIDir = iniData.GetStringValueOrDefault(nameof(MediaPlayingListINIDir), defaultKey, defaultMediaPlayingListDir);
+            ExceptionLogPath = iniData.GetStringValueOrDefault(nameof(ExceptionLogPath), defaultKey, defaultExceptionLogPath);
+            Volume = iniData.GetValueTypeValueOrDefault(nameof(Volume), defaultKey, 100);
+            SpeedRatio = iniData.GetValueTypeValueOrDefault(nameof(SpeedRatio), defaultKey, 1F);
+            PlayBackMode = (PlayBackMode)Enum.Parse(typeof(PlayBackMode), iniData.GetStringValueOrDefault(nameof(PlayBackMode), defaultKey, "RepeatOne"));
+            LastLibraryPagePivotIndex = iniData.GetValueTypeValueOrDefault(nameof(LastLibraryPagePivotIndex), defaultKey, 0);
         }
 
         public SettingsItemViewModel()
@@ -213,19 +244,22 @@ namespace MediaDesktop.UI.ViewModels
 
         private IniData EncodeIniData()
         {
-            
+
             IniData data = new IniData();
             data.Sections.AddSection(nameof(MediaItemRecordINIPath));
             data.Sections.AddSection(nameof(MediaPlayingListINIDir));
             data.Sections.AddSection(nameof(ExceptionLogPath));
             data.Sections.AddSection(nameof(Volume));
             data.Sections.AddSection(nameof(PlayBackMode));
+            data.Sections.AddSection(nameof(SpeedRatio));
+            data.Sections.AddSection(nameof(LastLibraryPagePivotIndex));
             data.Sections[nameof(MediaItemRecordINIPath)].AddKey(defaultKey, MediaItemRecordINIPath);
             data.Sections[nameof(MediaPlayingListINIDir)].AddKey(defaultKey, MediaPlayingListINIDir);
             data.Sections[nameof(ExceptionLogPath)].AddKey(defaultKey, ExceptionLogPath);
             data.Sections[nameof(Volume)].AddKey(defaultKey, Volume.ToString());
             data.Sections[nameof(PlayBackMode)].AddKey(defaultKey, PlayBackMode.ToString());
-
+            data.Sections[nameof(SpeedRatio)].AddKey(defaultKey, SpeedRatio.ToString());
+            data.Sections[nameof(LastLibraryPagePivotIndex)].AddKey(defaultKey, LastLibraryPagePivotIndex.ToString());
             return data;
         }
 
@@ -236,9 +270,21 @@ namespace MediaDesktop.UI.ViewModels
 
         }
 
+        /// <summary>
+        /// When media is changing, set its parameters.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
         private void MediaDesktopPlayer_MediaPlayerPlaying(object sender, LibVLCSharp.Shared.MediaPlayer args)
         {
-            Task.Run(()=> { args.Mute = true; Thread.Sleep(150); args.Volume = Volume; args.Mute = false; });
+            Task.Run(() =>
+            {
+                args.Mute = true;
+                Thread.Sleep(150);
+                args.Volume = Volume;
+                args.Mute = false;
+                args.SetRate(SpeedRatio);
+            });
         }
 
         private void This_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -249,12 +295,20 @@ namespace MediaDesktop.UI.ViewModels
 
                     break;
 
+                    //Volume settings is being changed.
                 case nameof(Volume):
                     if (GlobalResources.MediaDesktopPlayer.MediaPlayer != null)
                     {
                         GlobalResources.MediaDesktopPlayer.MediaPlayer.Volume = Volume;
                     }
                     break;
+
+                case nameof(SpeedRatio):
+                    if(GlobalResources.MediaDesktopPlayer.MediaPlayer != null)
+                    {
+                        GlobalResources.MediaDesktopPlayer.MediaPlayer.SetRate(SpeedRatio);
+                    }
+                    break; 
             }
 
         }

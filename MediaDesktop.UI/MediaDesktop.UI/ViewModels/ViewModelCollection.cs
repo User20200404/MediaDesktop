@@ -152,6 +152,7 @@ namespace MediaDesktop.UI.ViewModels
             EditViewModelCommand = new DelegateCommand((obj) => { EditViewModel(Views.Pages.ClientHostPage.Instance.XamlRoot, obj as MediaDesktopItemViewModel); });
             RemoveViewModelCommand = new DelegateCommand((obj) => { RemoveViewModel(Views.Pages.ClientHostPage.Instance.XamlRoot, obj as MediaDesktopItemViewModel); });
             ResetHistoryCommand = new DelegateCommand((obj) => { ResetHistory(Views.Pages.ClientHostPage.Instance.XamlRoot); });
+
         }
 
         private void EventStartup()
@@ -172,7 +173,7 @@ namespace MediaDesktop.UI.ViewModels
         }
 
         private void MediaDesktopPlayer_MediaPlayerEndReached(object sender, EventArgs e)
-        {
+        { 
             PlayBackMode mode = SettingsItemViewModel.PlayBackMode;
 
             switch (mode)
@@ -198,8 +199,14 @@ namespace MediaDesktop.UI.ViewModels
 
         private void PlayNext()
         {
-            if (CurrentPlayingList is null)
+            if (!CurrentPlayingList.Any())
                 return;
+
+            if (CurrentPlayingList.First() == CurrentPlayingList.Last())
+            {
+                PlayRepeatOne();
+                return;
+            }
 
             Task.Run(() =>
             {
@@ -208,9 +215,6 @@ namespace MediaDesktop.UI.ViewModels
                 {
                     //GlobalResources.MediaDesktopPlayer.MediaPlayer = CurrentPlayingList.First().MediaItemViewModel.RuntimeDataSet.MediaPlayer;
                     CurrentPlayingList.First().MediaItemViewModel.PlayMedia(GlobalResources.MediaDesktopPlayer);
-
-                    if(CurrentPlayingList.First() == CurrentPlayingList.Last())
-                        GlobalResources.MediaDesktopPlayer.Stop();
                 }
                 else
                 {
@@ -224,8 +228,13 @@ namespace MediaDesktop.UI.ViewModels
 
         private void PlayLast()
         {
-            if (CurrentPlayingList is null)
+            if (!CurrentPlayingList.Any())
                 return;
+            if (CurrentPlayingList.First() == CurrentPlayingList.Last())
+            {
+                PlayRepeatOne();
+                return;
+            }
 
             Task.Run(() =>
             {
@@ -362,12 +371,24 @@ namespace MediaDesktop.UI.ViewModels
         }
 
 
+        /// <summary>
+        /// Gets <see cref="MediaDesktopItemViewModel"/> that's currently playing, 
+        /// </summary>
+        /// <returns></returns>
         private MediaDesktopItemViewModel GetCurrentPlayingModel()
         {
             var collection = ViewModelItems.Where(model => model.MediaItemViewModel.RuntimeDataSet.IsMediaPlaying is true);
             if (collection.Any())
             {
-                return collection.First();
+                var collection_NotCurrent = collection.Where(model => model != CurrentDesktopItemViewModel);
+                if(collection_NotCurrent.Any())
+                {
+                    return collection_NotCurrent.First();
+                }
+                else
+                {
+                    return collection.First();
+                }
             }
             else
             {
@@ -614,16 +635,18 @@ namespace MediaDesktop.UI.ViewModels
                 ViewModelItems_History.Clear();
             }
         }
+
         #endregion
 
         #region Delegate Commands
-        public DelegateCommand PlayNextCommand { get; set; }
-        public DelegateCommand PlayLastCommand { get; set; }
-        public DelegateCommand AddPlayingListViewModelCommand { get; set; }
-        public DelegateCommand AddViewModelCommand { get; set; }
-        public DelegateCommand EditViewModelCommand { get; set; }
-        public DelegateCommand RemoveViewModelCommand { get; set; }
-        public DelegateCommand ResetHistoryCommand { get; set; }
+        public DelegateCommand PlayNextCommand { get; private set; }
+        public DelegateCommand PlayLastCommand { get; private set; }
+        public DelegateCommand AddPlayingListViewModelCommand { get; private set; }
+        public DelegateCommand AddViewModelCommand { get; private set; }
+        public DelegateCommand EditViewModelCommand { get; private set; }
+        public DelegateCommand RemoveViewModelCommand { get; private set; }
+        public DelegateCommand ResetHistoryCommand { get; private set; }
+
         #endregion
 
         #region Notify Event&Method

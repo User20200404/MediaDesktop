@@ -8,8 +8,8 @@
 
   <Identity
     Name="ef70dba4-6511-40af-a913-276de79579eb"
-    Publisher="CN=贾聪毅"
-    Version="1.0.0.0" />
+    Publisher="CN=JCY"
+    Version="1.0.1.0" />
 
   <Properties>
     <DisplayName>MediaDesktop.UI (Package)</DisplayName>

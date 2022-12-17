@@ -77,8 +77,21 @@ namespace MediaDesktop.UI.Views.Pages
             contentFrame.Navigate(typeof(LibraryPage));
 
             GlobalResources.ViewModelCollection.PropertyChanged += ViewModelCollection_PropertyChanged;
+            GlobalResources.MediaDesktopPlayer.ScreenSolutionChanged += System_ScreenSolutionChanged;
             progressSlider.AddHandler(PointerPressedEvent,new PointerEventHandler(ProgressSlider_PointerPressed), true);
             progressSlider.AddHandler(PointerReleasedEvent,new PointerEventHandler(ProgressSlider_PointerReleased), true);
+        }
+
+        /// <summary>
+        /// Invoked when screen solution changes.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void System_ScreenSolutionChanged(object sender, EventArgs e)
+        {
+            //To ensure the playing media to fill the screen, reset its StrechMode to resize properly.
+            if (CurrentMediaItemViewModel is not null)
+                CurrentMediaItemViewModel.RuntimeDataSet.StrechMode = MediaItemViewModel.MediaStrechMode.UniformToFill;
         }
 
         private void ViewModelCollection_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -86,6 +99,7 @@ namespace MediaDesktop.UI.Views.Pages
             switch(e.PropertyName)
             {
                 case nameof(GlobalResources.ViewModelCollection.CurrentDesktopItemViewModel):
+                    if(CurrentMediaItemViewModel is not null)
                     CurrentMediaItemViewModel.RuntimeDataSet.StrechMode = MediaItemViewModel.MediaStrechMode.UniformToFill;
                     return;
             }
@@ -133,6 +147,10 @@ namespace MediaDesktop.UI.Views.Pages
                 case nameof(leftNavigationView.SettingsItem):
                     if (contentFrame.Content is not SettingsPage)
                         contentFrame.Navigate(typeof(SettingsPage));
+                    break;
+                case nameof(navigationViewItem_Play):
+                    if(contentFrame.Content is not CurrentPlayingListPage)
+                        contentFrame.Navigate(typeof(CurrentPlayingListPage));
                     break;
             }
         }

@@ -6,6 +6,15 @@ using System.Windows.Forms;
 
 namespace MediaDesktop
 {
+    public struct WIN32tagCWPRETSTRUCT
+    {
+       public int lResult;
+       public uint lParam;
+       public uint wParam;
+       public uint message;
+       public IntPtr hwnd;
+    }
+
     public class APIsPackaged
     {
         /// <summary>
@@ -45,10 +54,18 @@ namespace MediaDesktop
             return Process.GetProcessById(processId);
         }
 
+        public static int GetThreadIdByWindowHandle(IntPtr windowHandle)
+        {
+             int tid = SystemAPIs.GetWindowThreadProcessId(windowHandle, out _);
+            return tid;
+        }
+
         public static void GetScreenResolution(out int width,out int height)
         {
-            height = Screen.PrimaryScreen.Bounds.Height;
-            width = Screen.PrimaryScreen.Bounds.Width;
+            width = System.Windows.Forms.SystemInformation.PrimaryMonitorSize.Width;
+            height = System.Windows.Forms.SystemInformation.PrimaryMonitorSize.Height;
+            //height = Screen.PrimaryScreen.Bounds.Height;
+            //width = Screen.PrimaryScreen.Bounds.Width;
         }
 
         public static Boolean ShowWindow(IntPtr windowHandle)

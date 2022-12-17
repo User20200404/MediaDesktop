@@ -7,7 +7,6 @@
     xmlns:local="using:MediaDesktop.UI.Views.Windows"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="using:MediaDesktop.UI.ViewModels"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     mc:Ignorable="d">
     <Page.Resources>
         <vm:IsFavouriteConverter x:Key="IsFavouriteConverter" />
@@ -19,11 +18,29 @@
     </Page.Resources>
 
     <Grid>
+        <!--<Image
+            Grid.RowSpan="3"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch"
+            d:DataContext="{d:DesignInstance Type=vm:MediaDesktopItemViewModel}"
+            DataContext="{x:Bind global:GlobalResources.ViewModelCollection.CurrentDesktopItemViewModel, Mode=OneWay}"
+            Source="{Binding ImagePath, Converter={StaticResource ImageSourceConverter}}"
+            Stretch="UniformToFill" />
+        <Rectangle
+            Grid.RowSpan="3"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch">
+            <Rectangle.Fill>
+                <AcrylicBrush TintColor="{ThemeResource SystemAccentColor}" TintOpacity="0.10" />
+            </Rectangle.Fill>
+        </Rectangle>-->
+
         <NavigationView
             x:Name="leftNavigationView"
             IsBackButtonVisible="Collapsed"
             IsSettingsVisible="True"
-            ItemInvoked="NavigationView_ItemInvoked">
+            ItemInvoked="NavigationView_ItemInvoked"
+            SelectedItem="{Binding ElementName=navigationViewItem_Lib}">
             <NavigationView.MenuItems>
                 <NavigationViewItem
                     x:Name="navigationViewItem_Play"
@@ -69,11 +86,10 @@
                             BorderBrush="#44FFFFFF"
                             BorderThickness="1"
                             CornerRadius="4">
-                            <Image HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                                <Image.Source>
-                                    <BitmapImage UriSource="{x:Bind global:GlobalResources.ViewModelCollection.CurrentDesktopItemViewModel.ImagePath, Mode=OneWay}" />
-                                </Image.Source>
-                            </Image>
+                            <Image
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Stretch"
+                                Source="{x:Bind global:GlobalResources.ViewModelCollection.CurrentDesktopItemViewModel.ImagePath, Mode=OneWay, Converter={StaticResource ImageSourceConverter}}" />
                         </Border>
 
                         <StackPanel
@@ -182,7 +198,44 @@
                                     <ResourceDictionary x:Key="Default" Source="/Resources/HeartButtonForeground.xaml" />
                                 </Button.Resources>
                             </Button>
-                            <Button Command="{x:Bind global:GlobalResources.ViewModelCollection.CurrentDesktopItemViewModel.MediaItemViewModel.ShowMediaInfoDialogCommand, Mode=OneWay}" Content="&#xF000;" />
+                            <Button x:Name="speedRatioButton" Content="&#xEC48;">
+                                <Button.Flyout>
+                                    <MenuFlyout>
+                                        <MenuFlyoutItem
+                                            Command="{x:Bind global:GlobalResources.ViewModelCollection.SettingsItemViewModel.SetSpeedRatioCommand, Mode=OneWay}"
+                                            CommandParameter="0.25"
+                                            Text="x0.25" />
+                                        <MenuFlyoutItem
+                                            Command="{x:Bind global:GlobalResources.ViewModelCollection.SettingsItemViewModel.SetSpeedRatioCommand, Mode=OneWay}"
+                                            CommandParameter="0.5"
+                                            Text="x0.5" />
+                                        <MenuFlyoutItem
+                                            Command="{x:Bind global:GlobalResources.ViewModelCollection.SettingsItemViewModel.SetSpeedRatioCommand, Mode=OneWay}"
+                                            CommandParameter="0.75"
+                                            Text="x0.75" />
+                                        <MenuFlyoutItem
+                                            Command="{x:Bind global:GlobalResources.ViewModelCollection.SettingsItemViewModel.SetSpeedRatioCommand, Mode=OneWay}"
+                                            CommandParameter="1.0"
+                                            Text="x1.0" />
+                                        <MenuFlyoutItem
+                                            Command="{x:Bind global:GlobalResources.ViewModelCollection.SettingsItemViewModel.SetSpeedRatioCommand, Mode=OneWay}"
+                                            CommandParameter="1.25"
+                                            Text="x1.25" />
+                                        <MenuFlyoutItem
+                                            Command="{x:Bind global:GlobalResources.ViewModelCollection.SettingsItemViewModel.SetSpeedRatioCommand, Mode=OneWay}"
+                                            CommandParameter="1.5"
+                                            Text="x1.5" />
+                                        <MenuFlyoutItem
+                                            Command="{x:Bind global:GlobalResources.ViewModelCollection.SettingsItemViewModel.SetSpeedRatioCommand, Mode=OneWay}"
+                                            CommandParameter="1.75"
+                                            Text="x1.75" />
+                                        <MenuFlyoutItem
+                                            Command="{x:Bind global:GlobalResources.ViewModelCollection.SettingsItemViewModel.SetSpeedRatioCommand, Mode=OneWay}"
+                                            CommandParameter="2.0"
+                                            Text="x2.0" />
+                                    </MenuFlyout>
+                                </Button.Flyout>
+                            </Button>
                             <Button x:Name="volumeButton" Content="{x:Bind global:GlobalResources.ViewModelCollection.SettingsItemViewModel.Volume, Converter={StaticResource VolumeIconConverter}, Mode=OneWay}">
                                 <Button.Flyout>
                                     <Flyout>
@@ -201,6 +254,17 @@
                                 </Button.Flyout>
                             </Button>
                             <Button Command="{x:Bind global:GlobalResources.ViewModelCollection.SettingsItemViewModel.SwitchPlayBackModeCommand}" Content="{x:Bind global:GlobalResources.ViewModelCollection.SettingsItemViewModel.PlayBackMode, Converter={StaticResource PlayBackModeConverter}, Mode=OneWay}" />
+                            <Button x:Name="moreButton" Content="&#xE712;">
+                                <Button.Flyout>
+                                    <MenuFlyout>
+                                        <MenuFlyoutItem Command="{x:Bind global:GlobalResources.ViewModelCollection.CurrentDesktopItemViewModel.MediaItemViewModel.ShowMediaInfoDialogCommand, Mode=OneWay}" Text="统计数据">
+                                            <MenuFlyoutItem.Icon>
+                                                <FontIcon Glyph="&#xF000;" />
+                                            </MenuFlyoutItem.Icon>
+                                        </MenuFlyoutItem>
+                                    </MenuFlyout>
+                                </Button.Flyout>
+                            </Button>
                         </StackPanel>
                     </Grid>
 

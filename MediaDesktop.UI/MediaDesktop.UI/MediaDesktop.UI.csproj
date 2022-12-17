@@ -1,41 +1,59 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <TargetFramework>net5.0-windows10.0.19041.0</TargetFramework>
-    <TargetPlatformMinVersion>10.0.19041.0</TargetPlatformMinVersion>
-    <RootNamespace>MediaDesktop.UI</RootNamespace>
-    <ApplicationManifest>app.manifest</ApplicationManifest>
-    <Platforms>x86;x64;arm64</Platforms>
-    <RuntimeIdentifiers>win10-x86;win10-x64;win10-arm64</RuntimeIdentifiers>
-    <UseWinUI>true</UseWinUI>
-  </PropertyGroup>
-  <ItemGroup>
-    <None Remove="Resources\HeartButtonForeground.xaml" />
-    <None Remove="Views\Dialogs\AddToPlayingListDialogPage.xaml" />
-    <None Remove="Views\Dialogs\MediaInfoDialogPage.xaml" />
-    <None Remove="Views\Dialogs\ModifyItemDialogPage.xaml" />
-    <None Remove="Views\Dialogs\ModifyPlayingListDialogPage.xaml" />
-    <None Remove="Views\Pages\ClientHostPage.xaml" />
-    <None Remove="Views\Pages\LibraryPage.xaml" />
-    <None Remove="Views\Pages\MediaPlayingListPage.xaml" />
-    <None Remove="Views\Pages\SettingsHostPage.xaml" />
-    <None Remove="Views\Pages\SettingsPage.xaml" />
-    <None Remove="Views\Pages\SettingsPage_About.xaml" />
-    <None Remove="Views\Pages\SettingsPage_Storage.xaml" />
-    <None Remove="Views\Windows\ClientWindow.xaml" />
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<RootNamespace>MediaDesktop.UI</RootNamespace>
+		<ApplicationManifest>app.manifest</ApplicationManifest>
+		<Platforms>x86;x64;arm64</Platforms>
+		<TargetFramework>net5.0-windows10.0.19041.0</TargetFramework>
+		<TargetPlatformMinVersion>10.0.19041.0</TargetPlatformMinVersion>
+		<RuntimeIdentifiers>win10-x86;win10-x64;win10-arm64</RuntimeIdentifiers>
+		<UseWinUI>true</UseWinUI>
+	</PropertyGroup>
+
+
+	<ItemGroup>
+		<None Remove="Resources\HeartButtonForeground.xaml" />
+		<None Remove="Views\Dialogs\AddToPlayingListDialogPage.xaml" />
+		<None Remove="Views\Dialogs\MediaInfoDialogPage.xaml" />
+		<None Remove="Views\Dialogs\ModifyItemDialogPage.xaml" />
+		<None Remove="Views\Dialogs\ModifyPlayingListDialogPage.xaml" />
+		<None Remove="Views\Pages\ClientHostPage.xaml" />
+		<None Remove="Views\Pages\CurrentPlayingListPage.xaml" />
+		<None Remove="Views\Pages\LibraryPage.xaml" />
+		<None Remove="Views\Pages\MediaPlayingListDetailsPage.xaml" />
+		<None Remove="Views\Pages\MediaPlayingListPage.xaml" />
+		<None Remove="Views\Pages\SettingsHostPage.xaml" />
+		<None Remove="Views\Pages\SettingsPage.xaml" />
+		<None Remove="Views\Pages\SettingsPage_About.xaml" />
+		<None Remove="Views\Pages\SettingsPage_Storage.xaml" />
+		<None Remove="Views\Windows\ClientWindow.xaml" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="ini-parser" Version="2.5.2">
+			<NoWarn>NU1701,</NoWarn>
+		</PackageReference>
+		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.1.4" />
+		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.25247-preview" />
+
+		<Manifest Include="$(ApplicationManifest)" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\..\WindowManager\WindowManager\WindowManager.csproj" />
+		<ProjectReference Include="..\..\MediaDesktop\MediaDesktop.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Page Update="Views\Pages\MediaPlayingListDetailsPage.xaml">
+			<Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="ini-parser" Version="2.5.2">
-      <NoWarn>NU1701,</NoWarn>
-    </PackageReference>
-    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.1.4" />
-    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22000.194" />
-    <Manifest Include="$(ApplicationManifest)" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\MediaDesktop\MediaDesktop.csproj" />
+    <Page Update="Views\Pages\CurrentPlayingListPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
 
   <ItemGroup>

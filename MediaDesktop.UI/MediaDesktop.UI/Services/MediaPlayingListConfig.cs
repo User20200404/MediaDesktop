@@ -13,7 +13,7 @@ namespace MediaDesktop.UI.Services
 {
     public class MediaPlayingListConfig
     {
-        private readonly string defaultKey = "Value";
+        //private readonly string defaultKey = "Value";
         private ViewModelCollection viewModelCollection;
         private FileIniDataParser FileIniDataParser = new FileIniDataParser();
         private ObservableCollection<MediaPlayingListViewModel> ViewModels
@@ -46,11 +46,11 @@ namespace MediaDesktop.UI.Services
                 {
                     string collectionFilePath = configDir + "\\" + sectionData.SectionName;
                     MediaPlayingListViewModel model = new MediaPlayingListViewModel();
-                    model.Title = iniData.GetValueOrDefault(sectionData.SectionName, nameof(model.Title), "未命名");
-                    model.Description = iniData.GetValueOrDefault(sectionData.SectionName, nameof(model.Description), "自定义播放列表");
-                    model.CoverImagePath = iniData.GetValueOrDefault(sectionData.SectionName, nameof(model.CoverImagePath), "");
-                    model.CreatedTime = DateTime.Parse(iniData.GetValueOrDefault(sectionData.SectionName, nameof(model.CreatedTime), DateTime.MinValue.ToString()));
-                    model.ModifiedTime = DateTime.Parse(iniData.GetValueOrDefault(sectionData.SectionName, nameof(model.ModifiedTime), DateTime.MinValue.ToString()));
+                    model.Title = iniData.GetStringValueOrDefault(sectionData.SectionName, nameof(model.Title), "未命名");
+                    model.Description = iniData.GetStringValueOrDefault(sectionData.SectionName, nameof(model.Description), "自定义播放列表");
+                    model.CoverImagePath = iniData.GetStringValueOrDefault(sectionData.SectionName, nameof(model.CoverImagePath), "");
+                    model.CreatedTime = DateTime.Parse(iniData.GetStringValueOrDefault(sectionData.SectionName, nameof(model.CreatedTime), DateTime.MinValue.ToString()));
+                    model.ModifiedTime = DateTime.Parse(iniData.GetStringValueOrDefault(sectionData.SectionName, nameof(model.ModifiedTime), DateTime.MinValue.ToString()));
 
                     var tempCollection = new ObservableCollection<MediaDesktopItemViewModel>();
                     tempCollection.InitMediaDesktopItemViewModelCollectionFromINI(collectionFilePath);

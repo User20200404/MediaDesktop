@@ -16,12 +16,14 @@
                 Margin="4"
                 HorizontalAlignment="Stretch"
                 HorizontalContentAlignment="Stretch"
-                VerticalContentAlignment="Stretch">
+                VerticalContentAlignment="Stretch"
+                Command="{x:Bind ParentFrameNavigateToMediaListDetailsPageCommand}"
+                CommandParameter="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}}">
                 <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="200" />
-                        <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
 
@@ -39,6 +41,7 @@
 
                     <StackPanel
                         Grid.Column="1"
+                        HorizontalAlignment="Left"
                         Orientation="Vertical"
                         Spacing="3">
                         <TextBlock
@@ -49,7 +52,7 @@
                             MaxWidth="500"
                             MaxHeight="90"
                             FontSize="13"
-                            Foreground="Gray"
+                            Foreground="#CCCCCC"
                             Text="{x:Bind Description, Mode=OneWay}"
                             TextWrapping="Wrap" />
                     </StackPanel>
@@ -70,6 +73,8 @@
                             </Style>
                         </StackPanel.Resources>
                         <Button Command="{x:Bind PlayMediaListCommand, Mode=OneWay}" Content="&#xF5B0;" />
+                        <Button Command="{x:Bind EditMediaListCommand, Mode=OneWay}" Content="&#xE70F;" />
+                        <Button Command="{x:Bind RemoveMediaListCommand, Mode=OneWay}" Content="&#xE74D;" />
                     </StackPanel>
                 </Grid>
             </Button>

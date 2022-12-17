@@ -10,6 +10,9 @@ using IniParser.Model;
 using IniParser.Parser;
 using Microsoft.UI.Dispatching;
 using MediaDesktop;
+using MediaDesktop.UI.Models;
+using System.ComponentModel;
+
 namespace MediaDesktop.UI.Services
 {
     public class GlobalResources
@@ -20,6 +23,7 @@ namespace MediaDesktop.UI.Services
         #endregion
 
         #region Global Resources
+        public static List<ImageCache> ImageCaches { get; private set; }
         public static MediaDesktopBase MediaDesktopBase { get; private set; }
         public static MediaDesktopPlayer MediaDesktopPlayer { get; private set; }
 
@@ -46,6 +50,7 @@ namespace MediaDesktop.UI.Services
             InitIniParser();
             InitMediaDesktopHelper();
             InitViewModel();
+            InitModel();
             await InitLibVLC();
             InitializeCompleted?.Invoke(typeof(GlobalResources), EventArgs.Empty);
         }
@@ -53,6 +58,7 @@ namespace MediaDesktop.UI.Services
         private static void GlobalResources_InitializeLibVLCCompeleted(object sender, EventArgs e)
         {
             MediaDesktopPlayer.LibVLC = LibVLC;
+            
         }
         #endregion
 
@@ -66,6 +72,11 @@ namespace MediaDesktop.UI.Services
         private static void InitViewModel()
         {
             ViewModelCollection = new ViewModelCollection();
+        }
+
+        private static void InitModel()
+        {
+            ImageCaches = new List<ImageCache>();
         }
 
         private static void InitMediaDesktopHelper()

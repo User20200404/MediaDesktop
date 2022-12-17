@@ -30,6 +30,7 @@
 
         <StackPanel
             Grid.Row="1"
+            Grid.Column="0"
             Orientation="Vertical"
             Spacing="15">
             <StackPanel.Resources>
@@ -46,8 +47,8 @@
                     <Setter Property="CornerRadius" Value="4" />
                 </Style>
                 <Style TargetType="TextBox">
-                    <Setter Property="MinWidth" Value="350" />
-                    <Setter Property="MaxWidth" Value="350" />
+                    <Setter Property="MinWidth" Value="300" />
+                    <Setter Property="MaxWidth" Value="300" />
                     <Setter Property="CornerRadius" Value="4" />
                 </Style>
                 <Style TargetType="StackPanel">
@@ -61,7 +62,15 @@
             </StackPanel>
             <StackPanel>
                 <TextBlock Text="封面路径" />
-                <TextBox PlaceholderText="封面才是灵魂(" Text="{Binding CoverImagePath, Mode=TwoWay}" />
+                <TextBox
+                    x:Name="imagePathTextBox"
+                    PlaceholderText="封面才是灵魂("
+                    Text="{Binding CoverImagePath, Mode=TwoWay}" />
+                <Button
+                    Margin="-10,0,0,0"
+                    Click="BrowseButton_Click"
+                    Content="浏览"
+                    Tag="{x:Bind imagePathTextBox}" />
             </StackPanel>
 
             <StackPanel>
@@ -73,5 +82,21 @@
                     TextWrapping="Wrap" />
             </StackPanel>
         </StackPanel>
+        <Border
+            Grid.Row="1"
+            Grid.Column="1"
+            Width="240"
+            Height="135"
+            Margin="-90,0,0,0"
+            VerticalAlignment="Center"
+            BorderBrush="Gray"
+            BorderThickness="1"
+            CornerRadius="4">
+            <Image
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
+                Source="{x:Bind imagePathTextBox.Text, Converter={StaticResource ImageSourceConverter}, Mode=OneWay}"
+                Stretch="UniformToFill" />
+        </Border>
     </Grid>
 </Page>

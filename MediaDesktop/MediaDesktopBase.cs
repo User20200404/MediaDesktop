@@ -2,6 +2,8 @@
 using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
+using WindowManager;
+
 namespace MediaDesktop
 {
     public class MediaDesktopBase
@@ -68,6 +70,9 @@ namespace MediaDesktop
         /// <exception cref="WorkerWNotFoundException"></exception>
         private void Startup()
         {
+            ReceiverForm.Instance.Show();
+            ReceiverForm.Instance.ScreenSolutionChanged += Instance_ScreenSolutionChanged;
+
             //[MAY THROW EXCEPTION]
             progManHandle = Validation.GetProgramManagerWindow();
 
@@ -83,6 +88,13 @@ namespace MediaDesktop
                 BackColor = Color.Pink,
                 FormBorderStyle = FormBorderStyle.None,
             };
+            SystemWindow handlerWindow = SystemWindow.GetByHandle(attachmentHandler.Handle);
+            handlerWindow.LayeredAttributes.Alpha = 255;
+        }
+
+        private void Instance_ScreenSolutionChanged(object sender, EventArgs e)
+        {
+            ResizeHandlerToScreen();
         }
 
 
@@ -107,12 +119,22 @@ namespace MediaDesktop
             }
             
             SystemAPIs.SetParent(attachmentHandler.Handle, targetHandle);
+            ResizeHandlerToScreen();
+        }
+
+        public void ResizeHandlerToScreen()
+        {
             APIsPackaged.GetScreenResolution(out int width, out int height);
-            attachmentHandler.Width = width;
-            attachmentHandler.Height = height;
-            attachmentHandler.Left = 0;
-            attachmentHandler.Top = 0;
+            ResizeHandler(width, height);
+        }
+
+        public void ResizeHandler(int width,int height)
+        {
             attachmentHandler.Show();
+            attachmentHandler.Width = width + 5;
+            attachmentHandler.Height = height + 5;
+            attachmentHandler.Top = 0;
+            attachmentHandler.Left = 0;
         }
 
         /// <summary>

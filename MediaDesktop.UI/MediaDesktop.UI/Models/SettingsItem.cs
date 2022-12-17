@@ -12,7 +12,9 @@ namespace MediaDesktop.UI.Models
         public string MediaPlayingListINIDir { get; set; }
         public string ExceptionLogPath { get; set; }
         public int Volume { get; set; }
+        public float SpeedRatio { get; set; }
         public PlayBackMode PlayBackMode { get; set; }  
+        public int LastLibraryPagePivotIndex { get; set; }
     }
     public enum PlayBackMode
     {

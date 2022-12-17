@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 
@@ -50,6 +51,11 @@ namespace MediaDesktop
         {
             KillExplorer();
             StartExplorer();
+        }
+
+        public static void UpdateWallPaper()
+        {
+            SystemAPIs.SystemParametersInfoA(0x14, 0, null, 0x2);
         }
     }
 }

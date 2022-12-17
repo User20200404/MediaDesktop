@@ -25,8 +25,8 @@ namespace MediaDesktop.UI.Services
 
         public static Size GetScreenResolution()
         {
-            int width = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Width;
-            int height = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Height;
+            int width = System.Windows.Forms.SystemInformation.PrimaryMonitorSize.Width;
+            int height = System.Windows.Forms.SystemInformation.PrimaryMonitorSize.Height;
             return new Size(width, height);
         }
 

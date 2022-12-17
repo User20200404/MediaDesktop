@@ -68,20 +68,22 @@ namespace MediaDesktop.UI.ViewModels
 
         public void LoadMedia(LibVLC libVLC)
         {
-            Media = new Media(libVLC, new Uri(MediaPath));
+            Media = new Media(libVLC, new Uri(MediaPath), "--file-caching=60000");
         }
 
         public void PlayMedia(MediaDesktopPlayer player)
         {
 
-            var parentDesktopViewModel = GlobalResources.ViewModelCollection.ViewModelItems.First(i => i.MediaItemViewModel == this);
-            if (!GlobalResources.ViewModelCollection.CurrentPlayingList.Contains(parentDesktopViewModel))
+            var parentDesktopViewModel = GlobalResources.ViewModelCollection.ViewModelItems.FirstOrDefault(i => i.MediaItemViewModel == this);
+            if (parentDesktopViewModel != null)
             {
-                GlobalResources.ViewModelCollection.CurrentPlayingList.Add(parentDesktopViewModel);
+                if (!GlobalResources.ViewModelCollection.CurrentPlayingList.Contains(parentDesktopViewModel))
+                {
+                    GlobalResources.ViewModelCollection.CurrentPlayingList.Add(parentDesktopViewModel);
+                }
+                player.MediaPlayer = RuntimeDataSet.MediaPlayer;
+                player.Play();
             }
-            player.MediaPlayer = RuntimeDataSet.MediaPlayer;
-            player.Play();
-
         }
 
         public void PauseMedia(MediaDesktopPlayer player)
@@ -167,6 +169,14 @@ namespace MediaDesktop.UI.ViewModels
             WinUI3Helper.SelectFileInExplorer(MediaPath);
         }
 
+        public void RemoveFromMediaPlayingList(IList<MediaDesktopItemViewModel> list)
+        {
+            var desktopItemViewModel = list.FirstOrDefault(i => i.MediaItemViewModel == this);
+            if(desktopItemViewModel != default(MediaDesktopItemViewModel))
+            {
+                list.Remove(desktopItemViewModel);
+            }
+        }
         #endregion
 
         #region DelegateCommands
@@ -179,6 +189,7 @@ namespace MediaDesktop.UI.ViewModels
         public DelegateCommand ToggleMediaStatusToCommand { get; set; }
         public DelegateCommand ShowMediaInfoDialogCommand { get; set; }
         public DelegateCommand SelectFileInExplorerCommand { get; set; }
+        public DelegateCommand RemoveFromMediaPlayingListCommand { get; set; }
 
         #endregion
 
@@ -198,6 +209,7 @@ namespace MediaDesktop.UI.ViewModels
             ToggleMediaStatusToCommand = new DelegateCommand((obj) => { var data = (ToggleMediaStatusData)obj; ToggleMediaStatusTo(data.Player, data.Action); });
             ShowMediaInfoDialogCommand = new DelegateCommand((obj) => { ShowMediaInfoDialog(Views.Pages.ClientHostPage.Instance.XamlRoot); });
             SelectFileInExplorerCommand = new DelegateCommand((obj) => { BrowseMediaFileInExplorer(); });
+            RemoveFromMediaPlayingListCommand = new DelegateCommand((obj) => { RemoveFromMediaPlayingList(obj as IList<MediaDesktopItemViewModel>); });
         }
         #endregion
 
@@ -381,10 +393,12 @@ namespace MediaDesktop.UI.ViewModels
             public MediaStrechMode StrechMode
             {
                 get { return strechMode; }
-                set { if(strechMode != value)
+                set
+                {
+                    ApplyStrechMode(value);
+                    if (strechMode != value)
                     {
                         strechMode = value;
-                        ApplyStrechMode(value);
                         OnPropertyChanged(nameof(StrechMode));
                     }
                 }

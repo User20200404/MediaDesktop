@@ -1,4 +1,6 @@
-﻿using Microsoft.UI.Xaml;
+﻿using MediaDesktop.UI.Services;
+using MediaDesktop.UI.Views.Windows;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Data;
@@ -12,6 +14,8 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Storage;
+using Windows.Storage.Pickers;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -26,6 +30,26 @@ namespace MediaDesktop.UI.Views.Dialogs
         public ModifyPlayingListDialogPage()
         {
             this.InitializeComponent();
+        }
+
+
+        private async void BrowseButton_Click(object sender, RoutedEventArgs e)
+        {
+            var targetTextBox = (sender as Control).Tag as TextBox;
+
+            FileOpenPicker picker = new FileOpenPicker();
+            picker.FileTypeFilter.Add(".png");
+            picker.FileTypeFilter.Add(".jpg");
+            picker.FileTypeFilter.Add(".jpeg");
+            picker.FileTypeFilter.Add(".gif");
+            picker.FileTypeFilter.Add(".bmp");
+
+            WinUI3Helper.PickerInitializeWindow(ClientWindow.Instance, picker);
+            StorageFile file = await picker.PickSingleFileAsync();
+            if (file is not null)
+            {
+                targetTextBox.Text = file.Path;
+            }
         }
     }
 }

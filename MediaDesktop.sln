@@ -1,13 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.32602.291
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32630.192
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{C7167F0D-BC9F-4E6E-AFE1-012C56B48DB5}") = "MediaDesktop.UI (Package)", "MediaDesktop.UI\MediaDesktop.UI (Package)\MediaDesktop.UI (Package).wapproj", "{2A7A245D-69B7-4E04-835A-3943B79A5C10}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MediaDesktop.UI", "MediaDesktop.UI\MediaDesktop.UI\MediaDesktop.UI.csproj", "{BE175A42-EC47-4BBC-85BE-8DAA77ADD17B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MediaDesktop.UI", "MediaDesktop.UI\MediaDesktop.UI\MediaDesktop.UI.csproj", "{BE175A42-EC47-4BBC-85BE-8DAA77ADD17B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MediaDesktop", "MediaDesktop\MediaDesktop.csproj", "{651185FA-82AD-4BD6-BE2E-409E28F51BF9}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WindowManager", "..\WindowManager\WindowManager\WindowManager.csproj", "{ABD58855-2748-4AA2-83DF-5F7B3730F93E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -71,6 +73,22 @@ Global
 		{651185FA-82AD-4BD6-BE2E-409E28F51BF9}.Release|x64.Build.0 = Release|x64
 		{651185FA-82AD-4BD6-BE2E-409E28F51BF9}.Release|x86.ActiveCfg = Release|Any CPU
 		{651185FA-82AD-4BD6-BE2E-409E28F51BF9}.Release|x86.Build.0 = Release|Any CPU
+		{ABD58855-2748-4AA2-83DF-5F7B3730F93E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ABD58855-2748-4AA2-83DF-5F7B3730F93E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ABD58855-2748-4AA2-83DF-5F7B3730F93E}.Debug|arm64.ActiveCfg = Debug|Any CPU
+		{ABD58855-2748-4AA2-83DF-5F7B3730F93E}.Debug|arm64.Build.0 = Debug|Any CPU
+		{ABD58855-2748-4AA2-83DF-5F7B3730F93E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{ABD58855-2748-4AA2-83DF-5F7B3730F93E}.Debug|x64.Build.0 = Debug|Any CPU
+		{ABD58855-2748-4AA2-83DF-5F7B3730F93E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{ABD58855-2748-4AA2-83DF-5F7B3730F93E}.Debug|x86.Build.0 = Debug|Any CPU
+		{ABD58855-2748-4AA2-83DF-5F7B3730F93E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ABD58855-2748-4AA2-83DF-5F7B3730F93E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ABD58855-2748-4AA2-83DF-5F7B3730F93E}.Release|arm64.ActiveCfg = Release|Any CPU
+		{ABD58855-2748-4AA2-83DF-5F7B3730F93E}.Release|arm64.Build.0 = Release|Any CPU
+		{ABD58855-2748-4AA2-83DF-5F7B3730F93E}.Release|x64.ActiveCfg = Release|Any CPU
+		{ABD58855-2748-4AA2-83DF-5F7B3730F93E}.Release|x64.Build.0 = Release|Any CPU
+		{ABD58855-2748-4AA2-83DF-5F7B3730F93E}.Release|x86.ActiveCfg = Release|Any CPU
+		{ABD58855-2748-4AA2-83DF-5F7B3730F93E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

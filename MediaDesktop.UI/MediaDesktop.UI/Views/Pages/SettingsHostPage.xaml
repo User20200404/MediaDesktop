@@ -9,7 +9,7 @@
     xmlns:vm="using:MediaDesktop.UI.ViewModels"
     xmlns:vp="using:MediaDesktop.UI.Views.Pages"
     x:Name="thisPage"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    Background="Transparent"
     Tag="设置"
     mc:Ignorable="d">
 
@@ -22,11 +22,8 @@
                 HorizontalContentAlignment="Stretch"
                 VerticalContentAlignment="Stretch"
                 Command="{x:Bind ParentFrameNavigateToPageDelegateCommand}"
-                CommandParameter="{Binding ElementName=gridHost, Path=Parent}">
-                <Grid
-                    x:Name="gridHost"
-                    HorizontalAlignment="Stretch"
-                    VerticalAlignment="Stretch">
+                CommandParameter="{Binding RelativeSource={RelativeSource Mode=Self}}">
+                <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*" />
                         <RowDefinition Height="*" />
@@ -61,7 +58,7 @@
                         HorizontalAlignment="Left"
                         VerticalAlignment="Top"
                         FontSize="14"
-                        Foreground="Gray"
+                        Foreground="#BBBBBB"
                         Text="{x:Bind Introduction, Mode=OneWay}" />
                     <Viewbox
                         Grid.RowSpan="2"

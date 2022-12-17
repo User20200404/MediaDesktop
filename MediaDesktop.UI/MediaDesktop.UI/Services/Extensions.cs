@@ -7,6 +7,8 @@ using IniParser.Model;
 using IniParser.Parser;
 using System.IO;
 using IniParser;
+using System.Reflection;
+
 namespace MediaDesktop.UI.Services
 {
     public static class Extensions
@@ -26,7 +28,7 @@ namespace MediaDesktop.UI.Services
             parser.WriteFile(path, data);
         }
 
-        public static string GetValueOrDefault(this IniData iniData, string sectionName, string keyName, string defaultValue = null)
+        public static string GetStringValueOrDefault(this IniData iniData, string sectionName, string keyName, string defaultValue = null)
         {
             if(iniData.Sections.ContainsSection(sectionName))
             {
@@ -39,11 +41,12 @@ namespace MediaDesktop.UI.Services
             return defaultValue;
         }
 
-        public static int GetIntValueOrDefault(this IniData iniData, string sectionName, string keyName, int defaultValue = 0)
+        public static T GetValueTypeValueOrDefault<T>(this IniData iniData, string sectionName, string keyName, T defaultValue = default(T)) where T : struct
         {
-            string value_string = GetValueOrDefault(iniData, sectionName, keyName, "0");
-            int.TryParse(value_string, out int result);
-            return result;
+            string value_string = GetStringValueOrDefault(iniData, sectionName, keyName, "0");
+            Type type = typeof(T);
+            object value = type.GetMethod("Parse", new Type[] { typeof(string) }).Invoke(null, new string[] { value_string });
+            return (T)value;
         }
     }
 }
